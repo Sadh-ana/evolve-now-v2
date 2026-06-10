@@ -133,7 +133,7 @@ function App() {
         <main style={{ marginLeft: '220px', flex: 1, overflowY: fullHeight ? 'hidden' : 'auto', height: fullHeight ? '100vh' : 'auto', position: 'relative', zIndex: 1 }}>
           {/* Mood mode picker — top right */}
           <div style={{ position: 'absolute', top: '18px', right: '20px', zIndex: 2 }}>
-            <MoodMode moodMode={moodMode} setMoodMode={setMoodMode} />
+            <MoodMode current={moodMode} onChange={setMoodMode} />
           </div>
           <PageWrap key={activePage}>
             {pages[activePage] || pageFallback}
