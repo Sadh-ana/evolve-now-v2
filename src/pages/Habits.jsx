@@ -30,6 +30,7 @@ const SUGGESTED = [
 export default function Habits({ session }) {
   const [habits, setHabits] = useState([])
   const [logs, setLogs] = useState([])
+  const [excusedDays, setExcusedDays] = useState([])
   const [showAdd, setShowAdd] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [newHabit, setNewHabit] = useState({ name: '', category: 'mental', frequency: 'daily' })
@@ -45,6 +46,17 @@ export default function Habits({ session }) {
     const startDate = format(subDays(new Date(), 84), 'yyyy-MM-dd')
     const { data: l } = await supabase.from('habit_logs').select('*').eq('user_id', uid).gte('completed_on', startDate)
     setLogs(l || [])
+
+    // Fetch scenario flags for last 90 days
+    const start90 = format(subDays(new Date(), 90), 'yyyy-MM-dd')
+    const { data: flags } = await supabase.from('scenario_flags').select('*')
+      .eq('user_id', uid).gte('date', start90)
+
+    const excusing = ['sick', 'rest-day', 'period', 'iron-low', 'adhd-day', 'tired', 'off-day']
+    const excusedList = (flags || [])
+      .filter(f => f.flags?.some(flag => excusing.includes(flag)))
+      .map(f => f.date)
+    setExcusedDays(excusedList)
   }
 
   async function addHabit(e) {
@@ -82,21 +94,25 @@ export default function Habits({ session }) {
 
   const isDoneToday = id => logs.some(l => l.habit_id === id && l.completed_on === today)
 
-  const getStreak = id => {
+  const getStreak = (id) => {
     let streak = 0
     let d = new Date()
     if (!isDoneToday(id)) d = subDays(d, 1)
-    while (true) {
+    while (streak < 365) {
       const ds = format(d, 'yyyy-MM-dd')
-      if (!logs.some(l => l.habit_id === id && l.completed_on === ds)) break
-      streak++
+      const done = logs.some(l => l.habit_id === id && l.completed_on === ds)
+      const excused = excusedDays.includes(ds)
+      if (!done && !excused) break
+      if (done) streak++
       d = subDays(d, 1)
     }
     return streak
   }
 
   const getHeatmap = id => eachDayOfInterval({ start: subDays(new Date(), 83), end: new Date() }).map(day => ({
-    date: day, done: logs.some(l => l.habit_id === id && l.completed_on === format(day, 'yyyy-MM-dd'))
+    date: day,
+    done: logs.some(l => l.habit_id === id && l.completed_on === format(day, 'yyyy-MM-dd')),
+    excused: excusedDays.includes(format(day, 'yyyy-MM-dd')),
   }))
 
   const getCat = id => CATEGORIES.find(c => c.id === id) || CATEGORIES[0]
@@ -152,7 +168,6 @@ export default function Habits({ session }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {filtered.map(habit => {
             const cat = getCat(habit.category)
-            const streak = getStreak(habit.id)
             const done = isDoneToday(habit.id)
             const heatmap = getHeatmap(habit.id)
             return (
@@ -169,14 +184,18 @@ export default function Habits({ session }) {
                     </div>
                   </div>
                   <div style={{ textAlign: 'center', flexShrink: 0, minWidth: '40px' }}>
-                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: '26px', color: streak > 0 ? 'var(--gold-300)' : 'var(--base-600)', lineHeight: 1 }}>{streak}</div>
+                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: '26px', color: getStreak(habit.id) > 0 ? 'var(--gold-300)' : 'var(--base-600)', lineHeight: 1 }}>{getStreak(habit.id)}</div>
                     <div style={{ fontSize: '9px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>streak</div>
                   </div>
                   <button onClick={() => deleteHabit(habit.id)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--base-600)', fontSize: '16px', flexShrink: 0 }}>×</button>
                 </div>
                 <div style={{ display: 'flex', gap: '2px', flexWrap: 'wrap' }}>
                   {heatmap.map((d, i) => (
-                    <div key={i} title={format(d.date, 'MMM d')} style={{ width: '10px', height: '10px', borderRadius: '2px', background: d.done ? cat.color : 'var(--base-700)', opacity: d.done ? 1 : 0.5, transition: 'background 0.2s' }} />
+                    <div key={i} title={format(d.date, 'MMM d')} style={{
+                      width: '10px', height: '10px', borderRadius: '2px',
+                      background: d.done ? cat.color : d.excused ? 'rgba(201,168,124,0.2)' : 'var(--base-700)',
+                      opacity: d.done ? 1 : d.excused ? 0.8 : 0.5,
+                    }} />
                   ))}
                 </div>
               </div>
