@@ -3,6 +3,7 @@ import { supabase } from './lib/supabase'
 import { requestPermission } from './lib/notifications'
 import Auth from './pages/Auth'
 import Onboarding from './pages/Onboarding'
+import Landing from './pages/Landing'
 import Sidebar from './components/layout/Sidebar'
 import AmbientLayer from './components/AmbientLayer'
 import Search from './components/Search'
@@ -40,6 +41,7 @@ function App() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(true)
   const [moodMode, setMoodMode] = useState('normal')
+  const [showAuth, setShowAuth] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -88,7 +90,10 @@ function App() {
     </div>
   )
 
-  if (!session) return <Auth />
+  if (!session) {
+    if (showAuth) return <Auth onBack={() => setShowAuth(false)} />
+    return <Landing onEnter={() => setShowAuth(true)} />
+  }
   if (!onboarded) return <Onboarding session={session} onComplete={() => { setOnboarded(true); fetchProfile(session.user.id) }} />
 
   const fullHeight = ['brainstorm', 'hobbies'].includes(activePage)
