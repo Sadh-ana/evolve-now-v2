@@ -2,119 +2,196 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { format } from 'date-fns'
 
-// Science-based challenge pools — specific, doable, rooted in behavioural research
-const CHALLENGE_POOL = [
-  // Cognitive / focus (based on deliberate practice + spacing effect)
-  { id: 'pomodoro_2', text: 'Do 2 focused Pomodoros today', detail: 'Two 25-min blocks = peak cognitive output for most brains', icon: '◷', color: '#9eb5d4', category: 'mind' },
-  { id: 'no_phone_morning', text: 'No phone for first 30 min after waking', detail: 'Cortisol spike + dopamine baseline reset — your focus will thank you', icon: '◎', color: '#c9a87c', category: 'mind' },
-  { id: 'single_task', text: 'Do one task with zero tabs open', detail: 'Context-switching costs 23 min of refocus. One thing. All the way.', icon: '◈', color: '#9eb5d4', category: 'mind' },
-  { id: 'review_notes', text: 'Spend 10 min reviewing yesterday\'s notes', detail: 'Spaced repetition increases retention by up to 80%', icon: '✦', color: '#c9a87c', category: 'mind' },
+// Science-backed challenge pool with evidence citations
+const CHALLENGE_POOLS = [
+  // Focus & cognitive
+  { id: 'f1', text: 'Complete one 25-min Pomodoro before checking your phone', science: 'Task initiation is the hardest part — 25 min feels achievable (Cirillo, 1980)', xp: 20, icon: '◷', color: '#9eb5d4' },
+  { id: 'f2', text: 'Do a full 90-min deep work session without interruptions', science: 'Ultradian BRAC cycle peaks at 90 min — this is your cognitive limit (Kleitman)', xp: 40, icon: '◷', color: '#9eb5d4' },
+  { id: 'f3', text: 'Start your hardest task within 10 minutes of sitting down', science: 'Activation energy is the enemy — starting is 80% of completion', xp: 25, icon: '◷', color: '#9eb5d4' },
+  { id: 'f4', text: 'No phone for the first 45 minutes after waking', science: 'Morning dopamine baseline stays clean — cognitive reserve is highest before input overload', xp: 30, icon: '◷', color: '#9eb5d4' },
+  { id: 'f5', text: 'Use the Feynman technique on one concept today', science: 'Teaching something you barely understand exposes knowledge gaps instantly (Feynman)', xp: 30, icon: '◷', color: '#9eb5d4' },
 
-  // Physical (movement science + energy management)
-  { id: 'walk_15', text: 'Take a 15-min walk — no headphones', detail: 'Default mode network activation = creative breakthroughs happen here', icon: '↑', color: '#a8c4a0', category: 'body' },
-  { id: 'water_2l', text: 'Hit 2L of water before 6pm', detail: 'Even 1% dehydration drops cognitive performance by 10%', icon: '◌', color: '#7fc4b0', category: 'body' },
-  { id: 'stretch_5', text: '5 min of stretching before you start work', detail: 'Reduces cortisol, increases blood flow to prefrontal cortex', icon: '◇', color: '#a8c4a0', category: 'body' },
-  { id: 'no_caffeine_after_2', text: 'No caffeine after 2pm today', detail: 'Caffeine half-life is 6 hrs. That 3pm coffee ruins 9pm sleep quality', icon: '◑', color: '#d4a5a5', category: 'body' },
+  // Habits & physical
+  { id: 'h1', text: 'Complete every single habit on your list today', science: 'Full completion activates the endowment effect — you feel more ownership over your streak', xp: 35, icon: '◎', color: '#a8c4a0' },
+  { id: 'h2', text: 'Move your body for at least 20 minutes', science: 'BDNF (brain-derived neurotrophic factor) peaks post-exercise — memory and focus improve', xp: 25, icon: '◎', color: '#a8c4a0' },
+  { id: 'h3', text: 'Drink 2L of water before 6pm', science: '2% dehydration reduces cognitive performance by 20% (Masento et al., 2014)', xp: 20, icon: '◎', color: '#a8c4a0' },
+  { id: 'h4', text: 'Be in bed ready to sleep by 10:30pm tonight', science: 'Sleep before midnight has 2x the slow-wave sleep density of post-midnight sleep', xp: 30, icon: '◎', color: '#a8c4a0' },
 
-  // Emotional regulation + wellbeing
-  { id: 'journal_3', text: 'Write 3 things you\'re actually grateful for', detail: 'Specificity matters — vague gratitude has no measurable effect', icon: '◇', color: '#d4a5a5', category: 'mind' },
-  { id: 'one_hard_thing', text: 'Do the thing you\'ve been avoiding first', detail: 'Completion of avoided tasks drops background anxiety by ~40%', icon: '◆', color: '#c9a87c', category: 'growth' },
-  { id: 'compliment', text: 'Say something genuine to someone today', detail: 'Oxytocin release benefits both giver and receiver equally', icon: '♡', color: '#d4a5a5', category: 'social' },
-  { id: 'screen_break', text: 'Take a 20-20-20 eye break every hour', detail: '20 sec looking 20 feet away every 20 min reduces eye strain 60%', icon: '◐', color: '#9eb5d4', category: 'body' },
+  // Mind & reflection
+  { id: 'm1', text: 'Write 3 specific things you\'re genuinely grateful for', science: 'Specificity matters — vague gratitude has no measurable effect (Emmons & McCullough, 2003)', xp: 15, icon: '✦', color: '#c9a87c' },
+  { id: 'm2', text: 'Do a 5-minute brain dump — write everything on your mind', science: 'Externalising cognitive load reduces working memory strain (Cognitive Load Theory, Sweller)', xp: 15, icon: '✦', color: '#c9a87c' },
+  { id: 'm3', text: 'Read 20 pages of something non-academic', science: 'Reading fiction reduces cortisol and stress by 68% in 6 minutes (University of Sussex, 2009)', xp: 20, icon: '✦', color: '#c9a87c' },
+  { id: 'm4', text: 'Spend 15 minutes on a hobby with zero productivity pressure', science: 'Intrinsic motivation activities restore executive function (SDT, Ryan & Deci, 2000)', xp: 20, icon: '✦', color: '#c9a87c' },
+  { id: 'm5', text: 'Sit quietly for 5 minutes without any input — just think', science: 'Default mode network activation (mind-wandering) consolidates memory and sparks insight', xp: 20, icon: '✦', color: '#c9a87c' },
 
-  // Growth / learning
-  { id: 'read_20', text: 'Read 20 pages of your current book', detail: '20 pages/day = 18 books/year. Most people read 1.', icon: '◁', color: '#b8a8d4', category: 'growth' },
-  { id: 'learn_one_thing', text: 'Learn one new concept and explain it simply', detail: 'Feynman technique: if you can\'t explain it simply, you don\'t know it', icon: '✦', color: '#b8a8d4', category: 'growth' },
-  { id: 'no_social_media_am', text: 'No social media before noon', detail: 'Morning social media primes threat-detection, not focus', icon: '◎', color: '#c9a87c', category: 'mind' },
+  // Social & growth
+  { id: 'g1', text: 'Say something genuine to someone today — not small talk', science: 'Oxytocin release benefits both giver and receiver equally (Kosfeld et al., 2005)', xp: 25, icon: '⊕', color: '#d4a5a5' },
+  { id: 'g2', text: 'Learn one new concept and explain it simply', science: 'Feynman technique: if you can\'t explain it simply, you don\'t know it', xp: 30, icon: '⊕', color: '#d4a5a5' },
+  { id: 'g3', text: 'Do one thing that makes your future self\'s life easier', science: 'Temporal self-continuity — people with stronger future-self connection make better decisions', xp: 25, icon: '⊕', color: '#d4a5a5' },
+  { id: 'g4', text: 'End today by writing tomorrow\'s top 3 priorities', science: 'Zeigarnik effect — incomplete tasks consume working memory. Writing closes the loop', xp: 20, icon: '⊕', color: '#d4a5a5' },
 ]
 
-function getDailyChallenges(dateStr) {
-  // Deterministic daily selection — same challenges all day, changes at midnight
-  const seed = dateStr.split('-').reduce((a, b) => a + parseInt(b), 0)
-  const shuffled = [...CHALLENGE_POOL].sort((a, b) => {
-    const ha = ((seed * 31 + a.id.charCodeAt(0)) % 100)
-    const hb = ((seed * 31 + b.id.charCodeAt(0)) % 100)
-    return ha - hb
-  })
-  return shuffled.slice(0, 3)
+function getDailySet(seed) {
+  const rng = (n) => {
+    let h = (seed + n * 2654435761) >>> 0
+    h = Math.imul(h ^ (h >>> 16), 0x45d9f3b) >>> 0
+    h = Math.imul(h ^ (h >>> 16), 0x45d9f3b) >>> 0
+    return (h ^ (h >>> 16)) >>> 0
+  }
+  const picked = []
+  const used = new Set()
+  let i = 0
+  while (picked.length < 3 && i < 200) {
+    const idx = rng(i++) % CHALLENGE_POOLS.length
+    if (!used.has(idx)) { used.add(idx); picked.push(CHALLENGE_POOLS[idx]) }
+  }
+  return picked
 }
 
-export default function DailyChallenges({ session }) {
+export default function DailyChallenges({ session, compact = false }) {
+  const [challenges, setChallenges] = useState([])
   const [completed, setCompleted] = useState([])
   const [loading, setLoading] = useState(true)
   const today = format(new Date(), 'yyyy-MM-dd')
-  const challenges = getDailyChallenges(today)
 
-  useEffect(() => { fetchCompleted() }, [])
+  useEffect(() => { load() }, [])
 
-  async function fetchCompleted() {
-    try {
-      const { data } = await supabase
-        .from('daily_challenge_logs')
-        .select('challenge_id')
-        .eq('user_id', session.user.id)
-        .eq('date', today)
-      setCompleted((data || []).map(d => d.challenge_id))
-    } catch {}
+  async function load() {
+    const uid = session.user.id
+    const { data } = await supabase.from('daily_challenges').select('*').eq('user_id', uid).eq('date', today).maybeSingle()
+    if (data) {
+      setChallenges(data.challenges || [])
+      setCompleted(data.completed || [])
+    } else {
+      const seed = parseInt(today.replace(/-/g, ''))
+      const set = getDailySet(seed)
+      const { data: saved } = await supabase.from('daily_challenges').insert({ user_id: uid, date: today, challenges: set, completed: [] }).select().single()
+      if (saved) { setChallenges(saved.challenges || []); setCompleted([]) }
+    }
     setLoading(false)
   }
 
-  async function toggle(challengeId) {
-    const uid = session.user.id
-    const done = completed.includes(challengeId)
-    if (done) {
-      await supabase.from('daily_challenge_logs').delete()
-        .eq('user_id', uid).eq('challenge_id', challengeId).eq('date', today)
-      setCompleted(p => p.filter(c => c !== challengeId))
-    } else {
-      await supabase.from('daily_challenge_logs').insert({ user_id: uid, challenge_id: challengeId, date: today })
-      setCompleted(p => [...p, challengeId])
-    }
+  async function complete(challenge) {
+    if (completed.includes(challenge.id)) return
+    const newCompleted = [...completed, challenge.id]
+    setCompleted(newCompleted)
+    await supabase.from('daily_challenges').update({ completed: newCompleted }).eq('user_id', session.user.id).eq('date', today)
+    try {
+      await supabase.from('xp_logs').insert({ user_id: session.user.id, amount: challenge.xp, reason: challenge.text, category: 'challenge' })
+    } catch (e) { /* xp_logs might not exist */ }
   }
 
+  if (loading) return null
+
+  const allDone = challenges.length > 0 && challenges.every(c => completed.includes(c.id))
   const doneCount = challenges.filter(c => completed.includes(c.id)).length
+  const xpTotal = challenges.reduce((s, c) => s + c.xp, 0)
+  const xpEarned = challenges.filter(c => completed.includes(c.id)).reduce((s, c) => s + c.xp, 0)
+
+  if (compact) return (
+    <div style={{ background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: '14px', padding: '1.25rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+        <div>
+          <span style={{ fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', fontFamily: 'var(--font-sans)', display: 'block', marginBottom: '2px' }}>Daily Challenges</span>
+          <span style={{ fontSize: '11px', color: allDone ? '#a8c4a0' : 'var(--muted)', fontFamily: 'var(--font-sans)' }}>
+            {allDone ? 'all done ✦' : `${doneCount}/3 · ${xpTotal - xpEarned} XP left`}
+          </span>
+        </div>
+        <div style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', color: 'var(--gold-300)', fontStyle: 'italic' }}>{xpEarned}<span style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>/{xpTotal}</span></div>
+      </div>
+
+      {/* Mini progress */}
+      <div style={{ height: '3px', background: 'var(--base-700)', borderRadius: '99px', overflow: 'hidden', marginBottom: '14px' }}>
+        <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--gold-300), var(--rose-300))', width: `${(doneCount / 3) * 100}%`, borderRadius: '99px', transition: 'width 0.5s ease' }} />
+      </div>
+
+      {challenges.map(c => {
+        const done = completed.includes(c.id)
+        return (
+          <div key={c.id} onClick={() => !done && complete(c)} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', padding: '9px 0', borderBottom: '0.5px solid var(--base-700)', cursor: done ? 'default' : 'pointer', opacity: done ? 0.55 : 1, transition: 'opacity 0.3s' }}>
+            <div style={{ width: '20px', height: '20px', borderRadius: '50%', flexShrink: 0, border: `1.5px solid ${done ? c.color : 'var(--base-500)'}`, background: done ? c.color : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', color: 'var(--base-950)', transition: 'all 0.25s', marginTop: '1px' }}>
+              {done && '✓'}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: '12px', color: done ? 'var(--muted)' : 'var(--cream-200)', fontFamily: 'var(--font-sans)', textDecoration: done ? 'line-through' : 'none', lineHeight: 1.4, marginBottom: '2px' }}>{c.text}</p>
+              <p style={{ fontSize: '10px', color: c.color, fontFamily: 'var(--font-sans)', opacity: 0.7 }}>+{c.xp} XP</p>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-        <span style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>{doneCount}/3 done today</span>
-        <div style={{ display: 'flex', gap: '4px' }}>
-          {challenges.map((c, i) => (
-            <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: completed.includes(c.id) ? c.color : 'var(--base-600)', transition: 'all 0.3s' }} />
-          ))}
+    <div style={{ padding: '32px', maxWidth: '780px' }}>
+      <div style={{ marginBottom: '28px' }}>
+        <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontStyle: 'italic', color: 'var(--cream-200)', marginBottom: '4px' }}>Daily Challenges</h2>
+        <p style={{ fontSize: '12px', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>
+          3 challenges · resets midnight · each grounded in behavioural science
+        </p>
+      </div>
+
+      {/* XP Progress */}
+      <div style={{ background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: '14px', padding: '16px 20px', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+          <span style={{ fontSize: '12px', color: 'var(--cream-200)', fontFamily: 'var(--font-sans)' }}>
+            {doneCount === 0 ? 'Nothing done yet — start anywhere' : doneCount === 1 ? 'One down. Momentum is building.' : doneCount === 2 ? 'Two done. Finish what you started.' : '✦ All three. You showed up.'}
+          </span>
+          <span style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', color: 'var(--gold-300)', fontStyle: 'italic' }}>{xpEarned}/{xpTotal} XP</span>
+        </div>
+        <div style={{ height: '6px', background: 'var(--base-700)', borderRadius: '99px', overflow: 'hidden' }}>
+          <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--gold-300), var(--rose-300))', width: `${(doneCount / 3) * 100}%`, borderRadius: '99px', transition: 'width 0.6s cubic-bezier(0.34,1.2,0.64,1)' }} />
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {challenges.map(c => {
+      {allDone && (
+        <div style={{ background: 'rgba(168,196,160,0.07)', border: '0.5px solid rgba(168,196,160,0.3)', borderRadius: '14px', padding: '16px 20px', marginBottom: '24px', textAlign: 'center' }}>
+          <p style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', fontStyle: 'italic', color: '#a8c4a0', marginBottom: '4px' }}>all challenges complete ✦</p>
+          <p style={{ fontSize: '12px', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>New set tomorrow. Consistency compounds.</p>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {challenges.map((c, i) => {
           const done = completed.includes(c.id)
           return (
-            <div
-              key={c.id}
-              onClick={() => toggle(c.id)}
-              style={{
-                display: 'flex', alignItems: 'flex-start', gap: '10px',
-                padding: '10px 12px', borderRadius: '10px', cursor: 'pointer',
-                background: done ? c.color + '12' : 'var(--base-700)',
-                border: `0.5px solid ${done ? c.color + '44' : 'var(--base-600)'}`,
-                transition: 'all 0.2s',
-              }}
-            >
-              <div style={{
-                width: '18px', height: '18px', borderRadius: '50%', flexShrink: 0, marginTop: '1px',
-                border: `1.5px solid ${done ? c.color : 'var(--base-500)'}`,
-                background: done ? c.color : 'transparent',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '9px', color: done ? 'var(--base-950)' : 'transparent',
-                transition: 'all 0.2s',
-              }}>✓</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: '12px', color: done ? 'var(--muted)' : 'var(--cream-200)', fontFamily: 'var(--font-sans)', fontWeight: 500, textDecoration: done ? 'line-through' : 'none', marginBottom: '2px', lineHeight: 1.3 }}>{c.text}</p>
-                <p style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', lineHeight: 1.4, fontStyle: 'italic' }}>{c.detail}</p>
+            <div key={c.id} style={{ background: done ? 'var(--base-800)' : 'var(--base-800)', border: `1px solid ${done ? c.color + '44' : 'var(--base-600)'}`, borderRadius: '16px', padding: '22px', transition: 'all 0.3s', opacity: done ? 0.65 : 1, position: 'relative', overflow: 'hidden' }}>
+              {/* Top accent line */}
+              {!done && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: `linear-gradient(90deg, transparent, ${c.color}66, transparent)` }} />}
+
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                <button onClick={() => !done && complete(c)} style={{ width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0, border: `2px solid ${done ? c.color : 'var(--base-500)'}`, background: done ? c.color : 'transparent', cursor: done ? 'default' : 'pointer', fontSize: '11px', color: 'var(--base-950)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.25s', marginTop: '2px' }}>
+                  {done && '✓'}
+                </button>
+
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '13px', color: c.color }}>{c.icon}</span>
+                    <span style={{ fontSize: '9px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-sans)' }}>challenge {i + 1}</span>
+                  </div>
+                  <p style={{ fontSize: '16px', color: done ? 'var(--muted)' : 'var(--cream-200)', fontFamily: 'var(--font-sans)', textDecoration: done ? 'line-through' : 'none', lineHeight: 1.5, marginBottom: '10px', fontWeight: 400 }}>{c.text}</p>
+
+                  {/* Science note */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', padding: '8px 12px', background: 'var(--base-700)', borderRadius: '8px', borderLeft: `2px solid ${c.color}44` }}>
+                    <span style={{ fontSize: '10px', color: c.color, flexShrink: 0 }}>✦</span>
+                    <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontStyle: 'italic', lineHeight: 1.5 }}>{c.science}</p>
+                  </div>
+                </div>
+
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '26px', color: done ? 'var(--muted)' : c.color, lineHeight: 1 }}>+{c.xp}</div>
+                  <div style={{ fontSize: '9px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>XP</div>
+                </div>
               </div>
             </div>
           )
         })}
+      </div>
+
+      <div style={{ marginTop: '24px', padding: '14px 18px', background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: '12px' }}>
+        <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontStyle: 'italic', lineHeight: 1.6 }}>
+          ✦ Variable reward schedule (Skinner): challenges change daily so your brain can't habituate to them. Predictable rewards stop working in 2 weeks. Unpredictable ones work indefinitely.
+        </p>
       </div>
     </div>
   )

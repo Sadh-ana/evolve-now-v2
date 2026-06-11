@@ -296,8 +296,8 @@ export default function Health({ session }) {
         <div>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontStyle: 'italic', fontWeight: 400, color: 'var(--cream-200)', marginBottom: '4px' }}>Health</h2>
           <p style={{ color: 'var(--muted)', fontSize: '12px', fontFamily: 'var(--font-sans)' }}>{format(new Date(), 'EEEE, MMMM d')} ✦</p>
+          <button onClick={() => setGender(null)} style={{ background: 'transparent', border: '0.5px solid var(--base-600)', borderRadius: '8px', padding: '5px 12px', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '11px', color: 'var(--muted)', marginTop: '6px' }}>change ↻</button>
         </div>
-        <button onClick={() => setGender(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: '11px', fontFamily: 'var(--font-sans)' }}>change profile</button>
       </div>
 
       {/* TABS */}

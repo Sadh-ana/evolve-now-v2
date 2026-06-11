@@ -112,11 +112,12 @@ export default function Physical({ session }) {
   const [workouts, setWorkouts] = useState([])
   const [showAdd, setShowAdd] = useState(false)
   const [nw, setNw] = useState({ activity: 'calisthenics', duration_minutes: 30, intensity: 'moderate', notes: '', date: format(new Date(), 'yyyy-MM-dd') })
+  const [activePlan, setActivePlan] = useState(null)
   // Plan generator state
   const [planConfig, setPlanConfig] = useState({ level: 'beginner', goal: 'strength', days: 3, duration: 45, equipment: 'minimal' })
   const [generatedPlan, setGeneratedPlan] = useState(null)
 
-  useEffect(() => { fetchWorkouts() }, [])
+  useEffect(() => { fetchWorkouts(); fetchActivePlan() }, [])
 
   async function fetchWorkouts() {
     const { data } = await supabase.from('workouts').select('*').eq('user_id', session.user.id).order('date', { ascending: false }).limit(30)
@@ -129,6 +130,30 @@ export default function Physical({ session }) {
     if (data) setWorkouts(p => [data, ...p])
     setShowAdd(false)
     setNw({ activity: 'calisthenics', duration_minutes: 30, intensity: 'moderate', notes: '', date: format(new Date(), 'yyyy-MM-dd') })
+  }
+
+  async function fetchActivePlan() {
+    const { data } = await supabase.from('workout_plans')
+      .select('*').eq('user_id', session.user.id).eq('active', true)
+      .order('created_at', { ascending: false }).limit(1).maybeSingle()
+    if (data) setActivePlan(data)
+  }
+
+  async function savePlan() {
+    if (!generatedPlan) return
+    await supabase.from('workout_plans').update({ active: false }).eq('user_id', session.user.id)
+    const { data } = await supabase.from('workout_plans').insert({
+      user_id: session.user.id,
+      name: generatedPlan.name,
+      config: planConfig,
+      plan: generatedPlan,
+      active: true,
+      start_date: format(new Date(), 'yyyy-MM-dd'),
+    }).select().single()
+    if (data) {
+      setActivePlan(data)
+      alert(`Plan saved! "${generatedPlan.name}" is now your active plan.`)
+    }
   }
 
   function buildPlan() {
@@ -178,6 +203,29 @@ export default function Physical({ session }) {
       </div>
 
       {/* LOG VIEW */}
+      {view === 'log' && activePlan && (() => {
+        const dayIndex = Math.floor((new Date() - new Date(activePlan.start_date)) / 86400000) % 7
+        const todayWorkout = activePlan.plan?.days?.[dayIndex]
+        if (!todayWorkout) return null
+        return (
+          <div style={{ background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: '14px', padding: '18px 20px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+              <div>
+                <p style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>today's workout — {activePlan.name}</p>
+                <p style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', fontStyle: 'italic', color: 'var(--cream-200)', margin: 0 }}>{todayWorkout.name}</p>
+              </div>
+              <span style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>Day {dayIndex + 1}/7</span>
+            </div>
+            <div style={{ display: 'grid', gap: '10px' }}>
+              {todayWorkout.exercises?.map((ex, i) => (
+                <div key={i} style={{ background: 'var(--base-900)', borderRadius: '12px', padding: '12px', fontSize: '12px', color: 'var(--cream-300)', fontFamily: 'var(--font-sans)' }}>
+                  {ex}
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
       {view === 'log' && (
         workouts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '56px 0' }}>
@@ -288,6 +336,9 @@ export default function Physical({ session }) {
                   </div>
                 ))}
               </div>
+              <button onClick={savePlan} style={{ marginTop: '16px', width: '100%', padding: '13px', background: 'var(--gold-300)', border: 'none', borderRadius: '12px', cursor: 'pointer', fontFamily: 'var(--font-serif)', fontSize: '18px', fontStyle: 'italic', color: 'var(--base-950)' }}>
+                save as my active plan ✦
+              </button>
             </div>
           )}
         </div>
