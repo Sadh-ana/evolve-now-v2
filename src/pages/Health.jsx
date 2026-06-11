@@ -250,6 +250,7 @@ export default function Health({ session }) {
   const lbl = { fontSize: '9px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '6px', fontFamily: 'var(--font-sans)' }
 
   // Gender selection screen
+  // Allow changing gender — find the tab header div and add this button
   if (loadingGender) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
       <p style={{ color: 'var(--muted)', fontFamily: 'var(--font-serif)', fontSize: '20px', fontStyle: 'italic' }}>loading...</p>
@@ -806,7 +807,7 @@ export default function Health({ session }) {
             </form>
           </div>
         </div>
-      )}
+      )}  
     </div>
   )
 }

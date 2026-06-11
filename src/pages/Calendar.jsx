@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, isToday, isSameDay, parseISO, differenceInDays } from 'date-fns'
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, subDays, startOfWeek, endOfWeek, isSameMonth, isToday, isSameDay, parseISO, differenceInDays } from 'date-fns'
 
 const CAT_COLORS = {
   academic: '#c9a87c', physical: '#d4a5a5', mental: '#9eb5d4',
