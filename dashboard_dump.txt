@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { format, subDays } from 'date-fns'
-import ChallengesCompact from '../components/ChallengesCompact'
-import BadgesCompact from '../components/BadgesCompact'
+import DailyChallenges from '../components/DailyChallenges'
+import Badges from '../components/Badges'
 
 const quotes = [
   "You don't rise to the level of your goals, you fall to the level of your systems.",
@@ -15,13 +15,13 @@ const quotes = [
 ]
 
 const SCENARIOS = [
-  { id: 'great', label: '✦ great', color: '#a8c4a0' },
-  { id: 'okay', label: '◎ okay', color: '#c9a87c' },
-  { id: 'tired', label: '◑ tired', color: '#9eb5d4' },
-  { id: 'sick', label: '◐ sick day', color: '#d4a5a5' },
-  { id: 'adhd', label: '⊗ ADHD brain', color: '#b8a8d4' },
-  { id: 'period', label: '◈ period', color: '#d4a5a5' },
-  { id: 'lowfocus', label: '⊙ low focus', color: '#8a7060' },
+  { id: 'great', label: 'âœ¦ great', color: '#a8c4a0' },
+  { id: 'okay', label: 'â—Ž okay', color: '#c9a87c' },
+  { id: 'tired', label: 'â—‘ tired', color: '#9eb5d4' },
+  { id: 'sick', label: 'â— sick day', color: '#d4a5a5' },
+  { id: 'adhd', label: 'âŠ— ADHD brain', color: '#b8a8d4' },
+  { id: 'period', label: 'â—ˆ period', color: '#d4a5a5' },
+  { id: 'lowfocus', label: 'âŠ™ low focus', color: '#8a7060' },
 ]
 
 const CIRCADIAN = [1,2,2,3,4,5,5,5,4,3,2,2,3,4,4,3,2,3,3,2,1,1,1,1]
@@ -185,17 +185,17 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
       {burnoutAlert && (
         <div style={{ background: '#d4a5a510', border: '0.5px solid var(--rose-300)', borderRadius: 'var(--radius-lg)', padding: '14px 20px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--rose-300)', fontFamily: 'var(--font-sans)', marginBottom: '2px' }}>⚠ Early burnout signal detected</p>
-            <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>Your energy has been low 3 days in a row. Lighter day suggested — 2 tasks max.</p>
+            <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--rose-300)', fontFamily: 'var(--font-sans)', marginBottom: '2px' }}>âš  Early burnout signal detected</p>
+            <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>Your energy has been low 3 days in a row. Lighter day suggested â€” 2 tasks max.</p>
           </div>
-          <button onClick={() => setBurnoutAlert(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: '18px' }}>×</button>
+          <button onClick={() => setBurnoutAlert(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: '18px' }}>Ã—</button>
         </div>
       )}
 
       {/* RECOVERY BANNER */}
       {isRecoveryDay && (
         <div style={{ background: '#9eb5d415', border: '0.5px solid #9eb5d4', borderRadius: 'var(--radius-lg)', padding: '12px 20px', marginBottom: '20px' }}>
-          <p style={{ fontSize: '12px', color: '#9eb5d4', fontFamily: 'var(--font-sans)' }}>◑ Recovery day active — habit streaks protected. Rest without guilt.</p>
+          <p style={{ fontSize: '12px', color: '#9eb5d4', fontFamily: 'var(--font-sans)' }}>â—‘ Recovery day active â€” habit streaks protected. Rest without guilt.</p>
         </div>
       )}
 
@@ -203,12 +203,12 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
       <div style={{ marginBottom: '24px' }}>
         <p style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'var(--font-sans)', marginBottom: '4px' }}>{today}</p>
         <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontWeight: 400, fontStyle: 'italic', color: 'var(--cream-200)', marginBottom: '6px' }}>
-          {greeting}, {userName || 'friend'} ✦
+          {greeting}, {userName || 'friend'} âœ¦
         </h2>
         <p style={{ fontSize: '13px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontStyle: 'italic', fontWeight: 300 }}>"{quote}"</p>
         {archetype && (
           <p style={{ fontSize: '11px', color: 'var(--gold-300)', fontFamily: 'var(--font-sans)', marginTop: '6px', letterSpacing: '0.06em' }}>
-            ◈ {archetype.replace(/-/g, ' ')} mode active
+            â—ˆ {archetype.replace(/-/g, ' ')} mode active
           </p>
         )}
       </div>
@@ -233,7 +233,7 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
       {cfg.showCircadian && (
         <div style={card({ marginBottom: '16px', padding: '16px 20px' })}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-          <span style={{ fontSize: '11px', color: 'var(--cream-300)', fontFamily: 'var(--font-sans)', fontWeight: 500 }}>Brain rhythm — circadian state</span>
+          <span style={{ fontSize: '11px', color: 'var(--cream-300)', fontFamily: 'var(--font-sans)', fontWeight: 500 }}>Brain rhythm â€” circadian state</span>
           <span style={{ fontSize: '11px', padding: '3px 10px', borderRadius: '99px', background: 'var(--base-700)', color: 'var(--gold-300)', fontFamily: 'var(--font-sans)', border: '0.5px solid var(--base-600)' }}>{brainMode}</span>
         </div>
         <div style={{ display: 'flex', gap: '3px', marginBottom: '6px' }}>
@@ -249,7 +249,7 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
         </div>
       )}
 
-      {/* TOP ROW — check-in + tasks */}
+      {/* TOP ROW â€” check-in + tasks */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '14px', marginBottom: '14px' }}>
         <div style={card()}>
           <span style={lbl}>Today's check-in</span>
@@ -270,7 +270,7 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
             </div>
           </div>
           <button onClick={saveCheckin} style={{ width: '100%', padding: '8px', borderRadius: 'var(--radius-sm)', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '12px', fontWeight: 500, transition: 'all 0.2s', background: checkinSaved ? 'var(--base-700)' : 'var(--gold-300)', color: checkinSaved ? 'var(--muted)' : 'var(--base-950)' }}>
-            {checkinSaved ? '✓ saved' : 'save check-in'}
+            {checkinSaved ? 'âœ“ saved' : 'save check-in'}
           </button>
         </div>
 
@@ -281,7 +281,7 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
             <button type="submit" style={{ padding: '8px 16px', background: 'var(--gold-300)', border: 'none', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '12px', fontWeight: 500, color: 'var(--base-950)' }}>+ Add</button>
           </form>
           {tasks.length === 0 ? (
-            <p style={{ color: 'var(--muted)', fontSize: '13px', fontFamily: 'var(--font-sans)', fontStyle: 'italic', textAlign: 'center', padding: '20px 0' }}>No tasks yet — add one above ✦</p>
+            <p style={{ color: 'var(--muted)', fontSize: '13px', fontFamily: 'var(--font-sans)', fontStyle: 'italic', textAlign: 'center', padding: '20px 0' }}>No tasks yet â€” add one above âœ¦</p>
           ) : tasks.map(task => (
             <div key={task.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 0', borderBottom: '0.5px solid var(--base-700)' }}>
               <button onClick={() => completeTask(task.id)} style={{ width: '18px', height: '18px', borderRadius: '4px', border: '1px solid var(--base-500)', background: 'transparent', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} />
@@ -297,14 +297,14 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
 
           {cfg.showHabits && (
             <div style={card()}>
-              <span style={lbl}>Habits — {habitLogs.filter(l => l.completed_on === format(new Date(), 'yyyy-MM-dd')).length}/{habits.length} done</span>
+              <span style={lbl}>Habits â€” {habitLogs.filter(l => l.completed_on === format(new Date(), 'yyyy-MM-dd')).length}/{habits.length} done</span>
               {habits.length === 0 ? (
                 <p style={{ color: 'var(--muted)', fontSize: '13px', fontFamily: 'var(--font-sans)', fontStyle: 'italic', textAlign: 'center', padding: '16px 0' }}>No habits yet</p>
               ) : habits.map(habit => {
                 const done = habitLogs.some(l => l.habit_id === habit.id && l.completed_on === format(new Date(), 'yyyy-MM-dd'))
                 return (
                   <div key={habit.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 0', borderBottom: '0.5px solid var(--base-700)' }}>
-                    <button onClick={() => toggleHabit(habit.id)} style={{ width: '20px', height: '20px', borderRadius: '50%', flexShrink: 0, cursor: 'pointer', border: `1.5px solid ${done ? 'var(--gold-300)' : 'var(--base-500)'}`, background: done ? 'var(--gold-300)' : 'transparent', color: done ? 'var(--base-950)' : 'transparent', fontSize: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>✓</button>
+                    <button onClick={() => toggleHabit(habit.id)} style={{ width: '20px', height: '20px', borderRadius: '50%', flexShrink: 0, cursor: 'pointer', border: `1.5px solid ${done ? 'var(--gold-300)' : 'var(--base-500)'}`, background: done ? 'var(--gold-300)' : 'transparent', color: done ? 'var(--base-950)' : 'transparent', fontSize: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>âœ“</button>
                     <span style={{ fontSize: '13px', color: done ? 'var(--muted)' : 'var(--cream-300)', fontFamily: 'var(--font-sans)', textDecoration: done ? 'line-through' : 'none', flex: 1 }}>{habit.name}</span>
                     {isRecoveryDay && !done && <span style={{ fontSize: '9px', color: '#9eb5d4', fontFamily: 'var(--font-sans)' }}>protected</span>}
                   </div>
@@ -320,8 +320,8 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
                 {[
                   { num: tasks.length, label: 'tasks left' },
                   { num: `${habitLogs.filter(l => l.completed_on === format(new Date(), 'yyyy-MM-dd')).length}/${habits.length}`, label: 'habits done' },
-                  { num: todayMins > 0 ? `${todayMins}m` : '—', label: 'focused today' },
-                  { num: weekMins > 0 ? `${Math.round(weekMins / 60)}h` : '—', label: 'this week' },
+                  { num: todayMins > 0 ? `${todayMins}m` : 'â€”', label: 'focused today' },
+                  { num: weekMins > 0 ? `${Math.round(weekMins / 60)}h` : 'â€”', label: 'this week' },
                 ].map((stat, i) => (
                   <div key={i} style={{ background: 'var(--base-700)', borderRadius: 'var(--radius-sm)', padding: '12px', textAlign: 'center' }}>
                     <div style={{ fontFamily: 'var(--font-serif)', fontSize: '26px', color: 'var(--gold-300)', fontWeight: 400, lineHeight: 1, marginBottom: '4px' }}>{stat.num}</div>
@@ -367,7 +367,7 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
                   <div style={{ height: '4px', background: 'var(--base-700)', borderRadius: '99px', overflow: 'hidden' }}>
                     <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--gold-300), var(--rose-300))', width: `${Math.max(2, xpPct)}%`, borderRadius: '99px', transition: 'width 0.5s' }} />
                   </div>
-                  <p style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', marginTop: '4px' }}>{totalXP} XP · {nextLevelXP - totalXP} to next</p>
+                  <p style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', marginTop: '4px' }}>{totalXP} XP Â· {nextLevelXP - totalXP} to next</p>
                 </div>
               </div>
             </div>
@@ -390,7 +390,7 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
               </div>
             ) : (
               <button onClick={generateWeeklyReport} disabled={generatingReport} style={{ padding: '7px 14px', background: generatingReport ? 'var(--base-700)' : 'var(--gold-300)', border: 'none', borderRadius: '8px', cursor: generatingReport ? 'default' : 'pointer', fontFamily: 'var(--font-sans)', fontSize: '11px', fontWeight: 500, color: generatingReport ? 'var(--muted)' : 'var(--base-950)' }}>
-                {generatingReport ? 'generating...' : 'Generate ✦'}
+                {generatingReport ? 'generating...' : 'Generate âœ¦'}
               </button>
             )}
           </div>
@@ -398,17 +398,17 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
       )}
 
       {(cfg.showChallenges || cfg.showBadges) && (
-        <div style={{ display: 'grid', gridTemplateColumns: (cfg.showChallenges && cfg.showBadges) ? '1fr 1fr' : '1fr', gap: '14px', alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: (cfg.showChallenges && cfg.showBadges) ? '1fr 1fr' : '1fr', gap: '14px' }}>
           {cfg.showChallenges && (
             <div style={card()}>
               <span style={lbl}>Daily challenges</span>
-              <ChallengesCompact session={session} />
+              <DailyChallenges session={session} />
             </div>
           )}
           {cfg.showBadges && (
             <div style={card()}>
               <span style={lbl}>Badges</span>
-              <BadgesCompact session={session} />
+              <Badges session={session} />
             </div>
           )}
         </div>
