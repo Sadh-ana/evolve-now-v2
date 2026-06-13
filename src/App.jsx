@@ -1,32 +1,36 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { supabase } from './lib/supabase'
 import { requestPermission } from './lib/notifications'
-import Auth from './pages/Auth'
-import Onboarding from './pages/Onboarding'
-import Landing from './pages/Landing'
 import Sidebar from './components/layout/Sidebar'
 import AmbientLayer from './components/AmbientLayer'
 import Search from './components/Search'
-import Dashboard from './pages/Dashboard'
-import Tasks from './pages/Tasks'
-import Calendar from './pages/Calendar'
-import Habits from './pages/Habits'
-import Focus from './pages/Focus'
-import Journal from './pages/Journal'
-import Stats from './pages/Stats'
-import Brainstorm from './pages/Brainstorm'
-import Hobbies from './pages/Hobbies'
-import Physical from './pages/Physical'
-import Health from './pages/Health'
-import Vision from './pages/Vision'
-import Settings from './pages/Settings'
-import StudyPlanner from './pages/StudyPlanner'
-import Reading from './pages/Reading'
-import StudyRoom from './pages/StudyRoom'
-import LifeCoach from './pages/LifeCoach'
-import DailyChallenges from './components/DailyChallenges'
-import Badges from './components/Badges'
 import MoodMode, { applyMoodMode, MOOD_MODES } from './components/MoodMode'
+import { LoadingState } from './components/ui'
+import AppErrorBoundary from './components/AppErrorBoundary'
+import { PrivacyPolicy, TermsOfService } from './pages/Legal'
+
+const Auth = lazy(() => import('./pages/Auth'))
+const Onboarding = lazy(() => import('./pages/Onboarding'))
+const Landing = lazy(() => import('./pages/Landing'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Tasks = lazy(() => import('./pages/Tasks'))
+const Calendar = lazy(() => import('./pages/Calendar'))
+const Habits = lazy(() => import('./pages/Habits'))
+const Focus = lazy(() => import('./pages/Focus'))
+const Journal = lazy(() => import('./pages/Journal'))
+const Stats = lazy(() => import('./pages/Stats'))
+const Brainstorm = lazy(() => import('./pages/Brainstorm'))
+const Hobbies = lazy(() => import('./pages/Hobbies'))
+const Physical = lazy(() => import('./pages/Physical'))
+const Vision = lazy(() => import('./pages/Vision'))
+const Health = lazy(() => import('./pages/Health'))
+const Settings = lazy(() => import('./pages/Settings'))
+const StudyPlanner = lazy(() => import('./pages/StudyPlanner'))
+const Reading = lazy(() => import('./pages/Reading'))
+const StudyRoom = lazy(() => import('./pages/StudyRoom'))
+const LifeCoach = lazy(() => import('./pages/LifeCoach'))
+const DailyChallenges = lazy(() => import('./components/DailyChallenges'))
+const Badges = lazy(() => import('./components/Badges'))
 
 function PageWrap({ children }) {
   return <div style={{ animation: 'pageEnter 0.28s ease forwards' }}>{children}</div>
@@ -85,16 +89,51 @@ function App() {
   useEffect(() => { if (session) setTimeout(() => requestPermission(), 3000) }, [session])
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: 'var(--base-950)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'var(--muted)', fontFamily: 'var(--font-serif)', fontSize: '24px', fontStyle: 'italic' }}>loading...</p>
-    </div>
+    <AppErrorBoundary>
+      <Suspense fallback={<LoadingState />}>
+        <div style={{ minHeight: '100vh', background: 'var(--base-950)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <p style={{ color: 'var(--muted)', fontFamily: 'var(--font-serif)', fontSize: '24px', fontStyle: 'italic' }}>loading...</p>
+        </div>
+      </Suspense>
+    </AppErrorBoundary>
   )
 
-  if (!session) {
-    if (showAuth) return <Auth onBack={() => setShowAuth(false)} />
-    return <Landing onEnter={() => setShowAuth(true)} />
+  // Allow direct hash links to legal pages even when unauthenticated
+  const directHash = typeof window !== 'undefined' ? window.location.hash.replace('#', '') : ''
+  if (!session && (directHash === 'privacy' || directHash === 'terms')) {
+    const comp = directHash === 'privacy' ? <PrivacyPolicy session={session} /> : <TermsOfService session={session} />
+    return (
+      <AppErrorBoundary>
+        <Suspense fallback={<LoadingState />}>
+          {comp}
+        </Suspense>
+      </AppErrorBoundary>
+    )
   }
-  if (!onboarded) return <Onboarding session={session} onComplete={() => { setOnboarded(true); fetchProfile(session.user.id) }} />
+
+  if (!session) {
+    if (showAuth) return (
+      <AppErrorBoundary>
+        <Suspense fallback={<LoadingState />}>
+          <Auth onBack={() => setShowAuth(false)} />
+        </Suspense>
+      </AppErrorBoundary>
+    )
+    return (
+      <AppErrorBoundary>
+        <Suspense fallback={<LoadingState />}>
+          <Landing onEnter={() => setShowAuth(true)} />
+        </Suspense>
+      </AppErrorBoundary>
+    )
+  }
+  if (!onboarded) return (
+    <AppErrorBoundary>
+      <Suspense fallback={<LoadingState />}>
+        <Onboarding session={session} onComplete={() => { setOnboarded(true); fetchProfile(session.user.id) }} />
+      </Suspense>
+    </AppErrorBoundary>
+  )
 
   const fullHeight = ['brainstorm', 'hobbies'].includes(activePage)
 
@@ -118,6 +157,8 @@ function App() {
     life_coach: <LifeCoach session={session} />,
     challenges: <DailyChallenges session={session} />,
     badges: <Badges session={session} />,
+    privacy: <PrivacyPolicy session={session} />,
+    terms: <TermsOfService session={session} />,
   }
 
   const pageFallback = (
@@ -130,7 +171,9 @@ function App() {
   )
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--base-950)', position: 'relative' }}>
+    <AppErrorBoundary>
+      <Suspense fallback={<LoadingState />}>
+        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--base-950)', position: 'relative' }}>
       <AmbientLayer />
       {searchOpen && <Search session={session} onNavigate={setActivePage} onClose={() => setSearchOpen(false)} />}
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', width: '100%' }}>
@@ -141,11 +184,15 @@ function App() {
             <MoodMode current={moodMode} onChange={setMoodMode} />
           </div>
           <PageWrap key={activePage}>
-            {pages[activePage] || pageFallback}
+                <Suspense fallback={<LoadingState />}>
+                  {pages[activePage] || pageFallback}
+                </Suspense>
           </PageWrap>
         </main>
       </div>
-    </div>
+        </div>
+      </Suspense>
+    </AppErrorBoundary>
   )
 }
 

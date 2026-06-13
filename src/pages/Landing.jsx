@@ -485,7 +485,11 @@ export default function Landing({ onEnter }) {
           <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#c9a87c', opacity: 0.5 }} />
           <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', color: 'rgba(138,112,96,0.5)', fontSize: '14px' }}>evolve</span>
         </div>
-        <span style={{ fontSize: '10px', color: 'rgba(138,112,96,0.4)', letterSpacing: '0.08em' }}>your growth, organised ✦</span>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <span style={{ fontSize: '10px', color: 'rgba(138,112,96,0.4)', letterSpacing: '0.08em' }}>your growth, organised ✦</span>
+          <a href="#privacy" onClick={(e) => { e.preventDefault(); window.location.hash = 'privacy' }} style={{ color: 'rgba(138,112,96,0.5)', fontSize: '12px', marginLeft: '12px', textDecoration: 'none' }}>Privacy</a>
+          <a href="#terms" onClick={(e) => { e.preventDefault(); window.location.hash = 'terms' }} style={{ color: 'rgba(138,112,96,0.5)', fontSize: '12px', marginLeft: '8px', textDecoration: 'none' }}>Terms</a>
+        </div>
       </div>
 
       <style>{`
