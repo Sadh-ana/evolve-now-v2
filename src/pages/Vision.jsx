@@ -26,8 +26,17 @@ export default function Vision({ session }) {
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({ totalXP: 0, level: 1, days: 0 })
   const [view, setView] = useState('timeline')
+  const [values, setValues] = useState([])
+  const [review, setReview] = useState({})
+  const [reviewSaved, setReviewSaved] = useState(false)
+  const [showAddMilestone, setShowAddMilestone] = useState(false)
+  const [nm, setNm] = useState({ title: '', description: '', milestone_date: '', icon: '✦', color: '#c9a87c' })
+
+  const iStyle = { width: '100%', background: 'var(--base-700)', border: '0.5px solid var(--base-600)', borderRadius: '12px', padding: '10px 14px', color: 'var(--cream-200)', fontSize: '13px', fontFamily: 'var(--font-sans)', outline: 'none' }
+  const lStyle = { fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '6px', fontFamily: 'var(--font-sans)' }
 
   useEffect(() => { fetchTimeline() }, [])
+  useEffect(() => { fetchValues() }, [])
 
   async function fetchTimeline() {
     const uid = session.user.id
@@ -48,6 +57,7 @@ export default function Vision({ session }) {
       supabase.from('focus_sessions').select('duration_minutes, date, created_at').eq('user_id', uid).order('created_at'),
       supabase.from('habit_logs').select('completed_on, created_at').eq('user_id', uid).order('created_at'),
       supabase.from('workouts').select('activity, date, created_at').eq('user_id', uid).order('created_at'),
+      supabase.from('custom_milestones').select('*').eq('user_id', uid).order('milestone_date'),
     ])
 
     const ev = []
@@ -125,6 +135,10 @@ export default function Vision({ session }) {
       })
     }
 
+    ;(customMilestones || []).forEach(m => {
+      ev.push({ date: m.milestone_date, icon: m.icon, color: m.color, title: m.title, desc: m.description || '', type: 'custom' })
+    })
+
     // Sort chronologically
     ev.sort((a, b) => new Date(a.date) - new Date(b.date))
     setEvents(ev)
@@ -138,6 +152,21 @@ export default function Vision({ session }) {
     setStats({ totalXP, level, days })
 
     setLoading(false)
+  }
+
+  async function fetchValues() {
+    const { data } = await supabase.from('user_values').select('values').eq('user_id', session.user.id).maybeSingle()
+    if (data?.values) setValues(data.values)
+
+    const { startOfWeek, format: fmt } = await import('date-fns')
+    const weekStart = fmt(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
+    const { data: rev } = await supabase.from('weekly_reviews').select('answers').eq('user_id', session.user.id).eq('week_start', weekStart).maybeSingle()
+    if (rev?.answers) setReview(rev.answers)
+  }
+
+  async function saveValues(newValues) {
+    setValues(newValues)
+    await supabase.from('user_values').upsert({ user_id: session.user.id, values: newValues, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
   }
 
   if (loading) return (
@@ -177,69 +206,158 @@ export default function Vision({ session }) {
         ))}
       </div>
 
-      {/* Timeline */}
-      {view !== 'timeline' ? (
-        <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>
-          <p style={{ fontStyle: 'italic' }}>{view === 'review' ? 'Weekly review — switch to Dashboard to generate a review.' : `The ${view} view is coming soon.`}</p>
+      {/* View content */}
+      {view === 'values' ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '0 14px' }}>
+          <p style={{ color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontSize: '13px' }}>Pick up to 5 values that matter most to you. EVOLVE will use these as a north star for your weekly priorities.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px' }}>
+            {['Growth','Health','Freedom','Creativity','Connection','Mastery','Balance','Curiosity','Focus','Joy'].map(v => {
+              const sel = values.includes(v)
+              return (
+                <button key={v} onClick={() => saveValues(sel ? values.filter(x => x !== v) : values.length < 5 ? [...values, v] : values)} style={{ padding: '12px 14px', textAlign: 'left', borderRadius: '12px', border: `0.5px solid ${sel ? 'var(--gold-300)' : 'var(--base-600)'}`, background: sel ? 'rgba(201,168,124,0.15)' : 'var(--base-800)', color: sel ? 'var(--cream-200)' : 'var(--muted)', fontFamily: 'var(--font-sans)', fontSize: '13px', cursor: 'pointer' }}>
+                  {v}
+                </button>
+              )
+            })}
+          </div>
+          <p style={{ color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontSize: '12px' }}>{values.length}/5 selected</p>
         </div>
-      ) : events.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 0' }}>
-          <p style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', fontStyle: 'italic', color: 'var(--gold-300)', marginBottom: '8px' }}>your story starts now ✦</p>
-          <p style={{ color: 'var(--muted)', fontSize: '13px', fontFamily: 'var(--font-sans)' }}>Complete tasks, log habits, and focus sessions to build your timeline.</p>
-        </div>
-      ) : (
-        <div style={{ position: 'relative', paddingLeft: '32px' }}>
-          {/* Vertical line */}
-          <div style={{
-            position: 'absolute', left: '11px', top: '8px', bottom: '8px', width: '1.5px',
-            background: 'linear-gradient(to bottom, var(--gold-300)44, var(--base-600) 80%, transparent)',
-          }} />
-
-          {events.map((ev, i) => (
-            <div key={i} style={{ position: 'relative', marginBottom: '20px', animation: `fadeInUp 0.5s ease ${Math.min(i * 0.05, 1)}s both` }}>
-              {/* Dot */}
-              <div style={{
-                position: 'absolute', left: '-32px', top: '4px',
-                width: '24px', height: '24px', borderRadius: '50%',
-                background: ev.color + '22', border: `1.5px solid ${ev.color}88`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '11px', color: ev.color, flexShrink: 0,
-                boxShadow: `0 0 10px ${ev.color}44`,
-              }}>{ev.icon}</div>
-
-              {/* Card */}
-              <div style={{
-                background: 'var(--base-800)', border: '0.5px solid var(--base-600)',
-                borderLeft: `2px solid ${ev.color}66`,
-                borderRadius: '12px', padding: '12px 16px',
-                marginLeft: '8px',
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
-                  <div>
-                    <p style={{ fontSize: '13px', color: 'var(--cream-200)', fontFamily: 'var(--font-sans)', fontWeight: 500, marginBottom: ev.desc ? '2px' : 0 }}>{ev.title}</p>
-                    {ev.desc && <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontStyle: 'italic' }}>{ev.desc}</p>}
-                  </div>
-                  <span style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                    {format(parseISO(ev.date), 'MMM d')}
-                  </span>
-                </div>
-              </div>
+      ) : view === 'review' ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', padding: '0 14px' }}>
+          <p style={{ color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontSize: '13px' }}>Save your current weekly review so EVOLVE can keep your progress and reflections aligned with your current week.</p>
+          {[
+            { key: 'wins', label: 'This week wins' },
+            { key: 'challenges', label: 'This week challenges' },
+            { key: 'next', label: 'Next week focus' },
+          ].map(field => (
+            <div key={field.key}>
+              <label style={lStyle}>{field.label}</label>
+              <textarea value={review[field.key] || ''} onChange={e => setReview(p => ({ ...p, [field.key]: e.target.value }))} rows={4} style={{ ...iStyle, resize: 'vertical' }} />
             </div>
           ))}
-
-          {/* "You are here" marker */}
-          <div style={{ position: 'relative', marginTop: '8px' }}>
-            <div style={{
-              position: 'absolute', left: '-32px', top: '4px',
-              width: '24px', height: '24px', borderRadius: '50%',
-              background: 'var(--gold-300)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '11px', color: 'var(--base-950)', flexShrink: 0,
-              animation: 'pulseGlow 2s ease-in-out infinite',
-            }}>✦</div>
-            <div style={{ marginLeft: '8px', padding: '12px 16px' }}>
-              <p style={{ fontSize: '13px', color: 'var(--gold-300)', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>you are here — still evolving</p>
-            </div>
+          <button onClick={async () => {
+            const { startOfWeek, format: fmt } = await import('date-fns')
+            const weekStart = fmt(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
+            await supabase.from('weekly_reviews').upsert({ user_id: session.user.id, week_start: weekStart, answers: review }, { onConflict: 'user_id,week_start' })
+            setReviewSaved(true); setTimeout(() => setReviewSaved(false), 3000)
+          }} style={{ padding: '12px 16px', background: 'var(--gold-300)', border: 'none', borderRadius: '12px', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '13px', fontWeight: 500, color: 'var(--base-950)' }}>
+            Save review
+          </button>
+          {reviewSaved && <p style={{ color: 'var(--gold-300)', fontFamily: 'var(--font-sans)', fontSize: '12px' }}>Saved for this week.</p>}
+        </div>
+      ) : view === 'timeline' ? (
+        <div style={{ position: 'relative', paddingLeft: '32px' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
+            <button onClick={() => setShowAddMilestone(true)} style={{ padding: '8px 16px', background: 'var(--gold-300)', border: 'none', borderRadius: '10px', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '12px', fontWeight: 500, color: 'var(--base-950)' }}>+ Add milestone</button>
           </div>
+          {events.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px 0' }}>
+              <p style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', fontStyle: 'italic', color: 'var(--gold-300)', marginBottom: '8px' }}>your story starts now ✦</p>
+              <p style={{ color: 'var(--muted)', fontSize: '13px', fontFamily: 'var(--font-sans)' }}>Complete tasks, log habits, and focus sessions to build your timeline.</p>
+            </div>
+          ) : (
+            <>
+              {/* Vertical line */}
+              <div style={{
+                position: 'absolute', left: '11px', top: '8px', bottom: '8px', width: '1.5px',
+                background: 'linear-gradient(to bottom, var(--gold-300)44, var(--base-600) 80%, transparent)',
+              }} />
+
+              {events.map((ev, i) => (
+                <div key={i} style={{ position: 'relative', marginBottom: '20px', animation: `fadeInUp 0.5s ease ${Math.min(i * 0.05, 1)}s both` }}>
+                  {/* Dot */}
+                  <div style={{
+                    position: 'absolute', left: '-32px', top: '4px',
+                    width: '24px', height: '24px', borderRadius: '50%',
+                    background: ev.color + '22', border: `1.5px solid ${ev.color}88`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '11px', color: ev.color, flexShrink: 0,
+                    boxShadow: `0 0 10px ${ev.color}44`,
+                  }}>{ev.icon}</div>
+
+                  {/* Card */}
+                  <div style={{
+                    background: 'var(--base-800)', border: '0.5px solid var(--base-600)',
+                    borderLeft: `2px solid ${ev.color}66`,
+                    borderRadius: '12px', padding: '12px 16px',
+                    marginLeft: '8px',
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+                      <div>
+                        <p style={{ fontSize: '13px', color: 'var(--cream-200)', fontFamily: 'var(--font-sans)', fontWeight: 500, marginBottom: ev.desc ? '2px' : 0 }}>{ev.title}</p>
+                        {ev.desc && <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontStyle: 'italic' }}>{ev.desc}</p>}
+                      </div>
+                      <span style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                        {format(parseISO(ev.date), 'MMM d')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* "You are here" marker */}
+              <div style={{ position: 'relative', marginTop: '8px' }}>
+                <div style={{
+                  position: 'absolute', left: '-32px', top: '4px',
+                  width: '24px', height: '24px', borderRadius: '50%',
+                  background: 'var(--gold-300)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '11px', color: 'var(--base-950)', flexShrink: 0,
+                  animation: 'pulseGlow 2s ease-in-out infinite',
+                }}>✦</div>
+                <div style={{ marginLeft: '8px', padding: '12px 16px' }}>
+                  <p style={{ fontSize: '13px', color: 'var(--gold-300)', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>you are here — still evolving</p>
+                </div>
+              </div>
+            </>
+          )}
+
+          {showAddMilestone && (
+            <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }} onClick={() => setShowAddMilestone(false)}>
+              <div style={{ background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: '20px', padding: '2rem', width: '100%', maxWidth: '440px' }} onClick={e => e.stopPropagation()}>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', fontStyle: 'italic', color: 'var(--cream-200)', marginBottom: '20px' }}>Add Milestone</h3>
+                <form onSubmit={async (e) => {
+                  e.preventDefault()
+                  const { data } = await supabase.from('custom_milestones').insert({ user_id: session.user.id, ...nm }).select().single()
+                  if (data) {
+                    setEvents(p => [...p, { date: data.milestone_date, icon: data.icon, color: data.color, title: data.title, desc: data.description || '', type: 'custom' }].sort((a, b) => new Date(a.date) - new Date(b.date)))
+                  }
+                  setNm({ title: '', description: '', milestone_date: '', icon: '✦', color: '#c9a87c' })
+                  setShowAddMilestone(false)
+                }} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div>
+                    <label style={lStyle}>Title</label>
+                    <input value={nm.title} onChange={e => setNm(p => ({ ...p, title: e.target.value }))} placeholder="e.g. Started my new job" required autoFocus style={iStyle} />
+                  </div>
+                  <div>
+                    <label style={lStyle}>Description (optional)</label>
+                    <input value={nm.description} onChange={e => setNm(p => ({ ...p, description: e.target.value }))} placeholder="A bit more detail..." style={iStyle} />
+                  </div>
+                  <div>
+                    <label style={lStyle}>Date</label>
+                    <input type="date" value={nm.milestone_date} onChange={e => setNm(p => ({ ...p, milestone_date: e.target.value }))} required style={{ ...iStyle, colorScheme: 'dark' }} />
+                  </div>
+                  <div>
+                    <label style={lStyle}>Icon</label>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                      {['✦','♡','◈','◷','↑','◎','◇','★','◑','⊕'].map(icon => (
+                        <button key={icon} type="button" onClick={() => setNm(p => ({ ...p, icon }))} style={{ width: '36px', height: '36px', borderRadius: '8px', border: `0.5px solid ${nm.icon === icon ? 'var(--gold-300)' : 'var(--base-600)'}`, background: nm.icon === icon ? 'rgba(201,168,124,0.15)' : 'var(--base-700)', color: nm.icon === icon ? 'var(--gold-300)' : 'var(--muted)', cursor: 'pointer', fontSize: '14px' }}>
+                          {icon}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button type="button" onClick={() => setShowAddMilestone(false)} style={{ flex: 1, padding: '11px', borderRadius: '12px', border: '0.5px solid var(--base-600)', background: 'transparent', color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+                    <button type="submit" style={{ flex: 2, padding: '11px', borderRadius: '12px', border: 'none', background: 'var(--gold-300)', color: 'var(--base-950)', fontFamily: 'var(--font-sans)', fontSize: '13px', fontWeight: 500, cursor: 'pointer' }}>Add ✦</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>
+          <p style={{ fontStyle: 'italic' }}>The {view} view is coming soon.</p>
         </div>
       )}
 
