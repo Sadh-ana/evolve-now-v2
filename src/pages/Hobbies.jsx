@@ -28,24 +28,29 @@ const SUGGESTED = [
 
 async function askAI(messages, hobbyName) {
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': import.meta.env.VITE_ANTHROPIC_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
+        'Authorization': `Bearer ${import.meta.env.VITE_GROQ_KEY}`,
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'llama-3.3-70b-versatile',
         max_tokens: 1000,
-        system: `You are EVOLVE's Side Quest AI — a brilliant, passionate companion for someone exploring ${hobbyName}. You're like a knowledgeable friend who genuinely loves this hobby. Be specific, not generic. Give real actionable advice. Keep responses to 2-4 sentences max. Always end with either a concrete next step or an interesting question. Be warm but direct.`,
-        messages: messages.map(m => ({ role: m.role, content: m.content }))
+        messages: [
+          { role: 'system', content: `You are EVOLVE's Side Quest AI — a brilliant, passionate companion for someone exploring ${hobbyName}. You're like a knowledgeable friend who genuinely loves this hobby. Be specific, not generic. Give real actionable advice. Keep responses to 2-4 sentences max. Always end with either a concrete next step or an interesting question. Be warm but direct.` },
+          ...messages.map(m => ({ role: m.role, content: m.content }))
+        ]
       })
     })
+    if (!res.ok) {
+      const err = await res.text()
+      console.error('Groq error:', err)
+      return 'Connection issue — check your Groq API key.'
+    }
     const data = await res.json()
-    return data.content?.[0]?.text || 'Something went wrong — try again.'
-  } catch {
+    return data.choices?.[0]?.message?.content || 'Something went wrong — try again.'
+  } catch (e) {
     return 'Connection failed. Check your network and try again.'
   }
 }

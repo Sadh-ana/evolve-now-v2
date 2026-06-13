@@ -4,31 +4,31 @@ import { format, subDays } from 'date-fns'
 
 async function askCoach(messages, systemPrompt) {
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': import.meta.env.VITE_ANTHROPIC_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
+        'Authorization': `Bearer ${import.meta.env.VITE_GROQ_KEY}`,
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
+        model: 'llama-3.3-70b-versatile',
         max_tokens: 800,
-        system: systemPrompt,
-        messages: messages.map(m => ({ role: m.role, content: m.content }))
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...messages.map(m => ({ role: m.role, content: m.content }))
+        ]
       })
     })
     if (!res.ok) {
       const err = await res.text()
       console.error('Coach API error:', err)
-      return 'Connection issue — check your Anthropic API key is set in your .env file as VITE_ANTHROPIC_KEY.'
+      return 'Connection issue — check your Groq API key is set in your .env file as VITE_GROQ_KEY.'
     }
     const data = await res.json()
-    return data.content?.[0]?.text || 'No response.'
+    return data.choices?.[0]?.message?.content || 'No response.'
   } catch (e) {
-    console.error('Coach fetch error:', e)
-    return 'Network error. Make sure you\'re running the app and your API key is configured.'
+    console.error('Coach fetch error:', e.message, e)
+    return 'Network error: ' + e.message
   }
 }
 
@@ -46,6 +46,7 @@ export default function LifeCoach({ session }) {
 
   async function init() {
     const uid = session.user.id
+    console.log('LifeCoach init', { uid, sessionUserId: session?.user?.id })
     const start7 = format(subDays(new Date(), 7), 'yyyy-MM-dd')
 
     const [{ data: prof }, { data: tasks }, { data: habits }, { data: focusSessions }, { data: checkins }, { data: msgs }] = await Promise.all([
