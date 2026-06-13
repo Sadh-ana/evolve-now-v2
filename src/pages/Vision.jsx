@@ -25,6 +25,7 @@ export default function Vision({ session }) {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({ totalXP: 0, level: 1, days: 0 })
+  const [view, setView] = useState('timeline')
 
   useEffect(() => { fetchTimeline() }, [])
 
@@ -167,8 +168,21 @@ export default function Vision({ session }) {
         </div>
       </div>
 
+      {/* View toggle */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '18px' }}>
+        {['goals','values','review','timeline'].map(v => (
+          <button key={v} onClick={() => setView(v)} style={{ padding: '8px 12px', borderRadius: '8px', border: 'none', cursor: 'pointer', background: view === v ? 'var(--gold-300)' : 'transparent', color: view === v ? 'var(--base-950)' : 'var(--muted)', fontFamily: 'var(--font-sans)', fontSize: '12px' }}>
+            {v === 'review' ? 'Weekly Review' : v === 'timeline' ? 'Timeline' : v.charAt(0).toUpperCase() + v.slice(1)}
+          </button>
+        ))}
+      </div>
+
       {/* Timeline */}
-      {events.length === 0 ? (
+      {view !== 'timeline' ? (
+        <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>
+          <p style={{ fontStyle: 'italic' }}>{view === 'review' ? 'Weekly review — switch to Dashboard to generate a review.' : `The ${view} view is coming soon.`}</p>
+        </div>
+      ) : events.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 0' }}>
           <p style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', fontStyle: 'italic', color: 'var(--gold-300)', marginBottom: '8px' }}>your story starts now ✦</p>
           <p style={{ color: 'var(--muted)', fontSize: '13px', fontFamily: 'var(--font-sans)' }}>Complete tasks, log habits, and focus sessions to build your timeline.</p>
