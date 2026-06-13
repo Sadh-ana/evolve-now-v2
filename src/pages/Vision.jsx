@@ -49,6 +49,7 @@ export default function Vision({ session }) {
       { data: focusSessions },
       { data: habitLogs },
       { data: workouts },
+      { data: customMilestones },
     ] = await Promise.all([
       supabase.from('profiles').select('created_at, name, onboarded').eq('id', uid).single(),
       supabase.from('achievements').select('badge_id, created_at').eq('user_id', uid).order('created_at'),
