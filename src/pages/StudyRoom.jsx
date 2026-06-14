@@ -261,11 +261,20 @@ export default function StudyRoom({ session }) {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'study_room_messages' }, (payload) => {
         if (payload.new.room_code === roomCode) setMessages(prev => [...prev, payload.new])
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'study_room_presence' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'study_room_presence', filter: `room_code=eq.${roomCode}` }, () => {
         fetchPresence(roomCode)
       })
       .subscribe()
     channelRef.current = channel
+
+    // Poll presence every 5s as fallback — ensures people appear even if realtime misses
+    if (pingRef.current) clearInterval(pingRef.current)
+    pingRef.current = setInterval(async () => {
+      await supabase.from('study_room_presence').update({
+        last_seen: new Date().toISOString(), status
+      }).eq('user_id', session.user.id)
+      fetchPresence(roomCode)
+    }, 5000)
   }
 
   async function fetchPresence(roomCode = null) {
@@ -298,10 +307,6 @@ export default function StudyRoom({ session }) {
     fetchMessages(code)
     setupRealtime(code)
     fetchPresence(code)
-    pingRef.current = setInterval(async () => {
-      await supabase.from('study_room_presence').update({ last_seen: new Date().toISOString(), status }).eq('user_id', session.user.id)
-      fetchPresence(code)
-    }, 20000)
   }
 
   async function leaveRoom() {
@@ -540,7 +545,7 @@ export default function StudyRoom({ session }) {
       <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
         {/* Top bar */}
-        <div style={{ padding: '12px 20px', borderBottom: '0.5px solid var(--base-600)', background: 'var(--base-900)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, gap: '12px' }}>
+        <div style={{ padding: '12px 20px', borderBottom: '0.5px solid var(--base-600)', background: 'var(--base-900)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, gap: '12px', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#a8c4a0', boxShadow: '0 0 8px #a8c4a0', animation: 'orbPulse 2s infinite' }} />
             <span style={{ fontSize: '13px', color: 'var(--cream-200)', fontFamily: 'var(--font-sans)', fontWeight: 500 }}>
