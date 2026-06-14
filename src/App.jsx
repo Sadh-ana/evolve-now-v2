@@ -29,6 +29,7 @@ const StudyPlanner = lazy(() => import('./pages/StudyPlanner'))
 const Reading = lazy(() => import('./pages/Reading'))
 const StudyRoom = lazy(() => import('./pages/StudyRoom'))
 const LifeCoach = lazy(() => import('./pages/LifeCoach'))
+const Friends = lazy(() => import('./pages/Friends'))
 const DailyChallenges = lazy(() => import('./components/DailyChallenges'))
 const Badges = lazy(() => import('./components/Badges'))
 
@@ -150,6 +151,7 @@ function App() {
     health: <Health session={session} />,
     vision: <Vision session={session} />,
     stats: <Stats session={session} />,
+    friends: <Friends session={session} setActivePage={setActivePage} />,
     settings: <Settings session={session} />,
     study: <StudyPlanner session={session} />,
     reading: <Reading session={session} />,
