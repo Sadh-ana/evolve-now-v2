@@ -151,7 +151,7 @@ export default function Auth({ onBack }) {
                 <label style={labelStyle}>Your name</label>
                 <input
                   type="text" value={name} onChange={e => setName(e.target.value)}
-                  placeholder="Sadhana" required style={inputStyle}
+                  placeholder="Your name" required style={inputStyle}
                   onFocus={e => e.target.style.borderColor = 'rgba(201,168,124,0.4)'}
                   onBlur={e => e.target.style.borderColor = 'rgba(201,168,124,0.15)'}
                 />

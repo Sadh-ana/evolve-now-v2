@@ -233,13 +233,20 @@ export default function StudyRoom({ session }) {
   }
 
   function setupInviteListener() {
-    const channel = supabase.channel('invite-listener-' + session.user.id)
-    channel.on('postgres_changes', {
-      event: 'INSERT', schema: 'public', table: 'study_room_invites',
-      filter: `to_user_id=eq.${session.user.id}`
-    }, (payload) => {
-      setInvites(p => [payload.new, ...p])
-    }).subscribe()
+    const channel = supabase
+      .channel('invite-listener-' + session.user.id)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'study_room_invites',
+        filter: `to_user_id=eq.${session.user.id}`
+      }, (payload) => {
+        setInvites(p => [payload.new, ...p])
+      })
+    channel.subscribe((status) => {
+      if (status === 'CHANNEL_ERROR') {
+        console.log('Invite listener failed — falling back to polling')
+        setInterval(() => fetchInvites(), 15000)
+      }
+    })
   }
 
   function setupRealtime(roomCode) {
