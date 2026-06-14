@@ -107,8 +107,15 @@ export default function Friends({ session, setActivePage }) {
   return (
     <div style={{ padding: '32px', maxWidth: '800px' }}>
       <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontStyle: 'italic', color: 'var(--cream-200)', marginBottom: '4px' }}>Friends</h2>
-      <p style={{ color: 'var(--muted)', fontSize: '12px', fontFamily: 'var(--font-sans)', marginBottom: '28px' }}>your username: <span style={{ color: 'var(--gold-300)' }}>@{myUsername}</span></p>
-
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px', padding: '12px 16px', background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: '12px', width: 'fit-content' }}>
+        <div>
+          <p style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '3px' }}>Your username — share this with friends</p>
+          <p style={{ fontSize: '18px', color: 'var(--gold-300)', fontFamily: 'var(--font-sans)', fontWeight: 500 }}>@{myUsername || 'not set'}</p>
+        </div>
+        <button onClick={() => navigator.clipboard.writeText(myUsername)} style={{ padding: '7px 14px', background: 'transparent', border: '0.5px solid var(--base-600)', borderRadius: '8px', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '11px', color: 'var(--muted)' }}>Copy</button>
+        {!myUsername && <span style={{ fontSize: '11px', color: 'var(--rose-300)', fontFamily: 'var(--font-sans)' }}>← set in Settings first</span>}
+      </div>
+      
       {/* Study invites */}
       {studyInvites.length > 0 && (
         <div style={{ marginBottom: '24px' }}>

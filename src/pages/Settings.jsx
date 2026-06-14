@@ -58,8 +58,13 @@ export default function Settings({ session }) {
   async function save() {
     setSaving(true)
     await supabase.from('profiles').update({
-      name: profile.name, board: profile.board, archetype: profile.archetype,
-      health_flags: healthFlags, peak_time: peakTime,
+      name: profile.name,
+      username: profile.username,
+      archetype: profile.archetype,
+      health_flags: profile.health_flags,
+      board: profile.board,
+      peak_time: profile.peak_time,
+      work_style: profile.work_style,
     }).eq('id', session.user.id)
     setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2500)
   }
@@ -97,6 +102,15 @@ export default function Settings({ session }) {
         <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontStyle: 'italic', fontWeight: 400, color: 'var(--cream-200)', marginBottom: '4px' }}>Settings</h2>
         <p style={{ color: 'var(--muted)', fontSize: '12px', fontFamily: 'var(--font-sans)' }}>your EVOLVE, configured ✦</p>
       </div>
+      <div style={{ marginBottom: '16px' }}>
+                  <label style={lbl}>Username (used for friends & study room)</label>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <span style={{ padding: '10px 10px 10px 14px', background: 'var(--base-700)', border: '0.5px solid var(--base-600)', borderRadius: '10px 0 0 10px', color: 'var(--muted)', fontSize: '13px', fontFamily: 'var(--font-sans)' }}>@</span>
+                    <input value={profile.username || ''} onChange={e => upd('username', e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 24))} style={{ ...iStyle, borderRadius: '0 10px 10px 0', borderLeft: 'none', flex: 1 }} placeholder="sadhana_studies" />
+                  </div>
+                  <p style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', marginTop: '4px' }}>lowercase, underscores ok, max 24 chars</p>
+                </div>
+                
 
       {/* Section tabs */}
       <div style={{ display: 'flex', gap: '4px', marginBottom: '24px', flexWrap: 'wrap' }}>
