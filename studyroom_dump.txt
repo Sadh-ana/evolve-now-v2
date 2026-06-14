@@ -53,55 +53,69 @@ function Animal({ animal = 'bear', size = 80, isTyping = false, status = 'focusi
           </div>
         )}
         <svg width={s} height={s * 1.1} style={{ transform: `translateY(${bounceY}px)`, transition: isTyping ? 'none' : 'transform 0.3s ease', filter: `drop-shadow(0 4px 12px ${c.body}44)` }}>
-          <ellipse cx={cx} cy={s*0.68} rx={s*0.34} ry={s*0.3} fill={c.body} />
-          <ellipse cx={cx} cy={s*0.72} rx={s*0.2} ry={s*0.2} fill={c.belly} opacity="0.8" />
-          {animal === 'bunny' ? (<>
-            <ellipse cx={cx-s*0.15} cy={s*0.18} rx={s*0.065} ry={s*0.16} fill={c.body} />
-            <ellipse cx={cx-s*0.15} cy={s*0.18} rx={s*0.035} ry={s*0.11} fill={c.ear} opacity="0.6" />
-            <ellipse cx={cx+s*0.15} cy={s*0.18} rx={s*0.065} ry={s*0.16} fill={c.body} />
-            <ellipse cx={cx+s*0.15} cy={s*0.18} rx={s*0.035} ry={s*0.11} fill={c.ear} opacity="0.6" />
-          </>) : (<>
-            <circle cx={cx-s*0.2} cy={s*0.22} r={s*0.1} fill={c.ear} />
-            <circle cx={cx-s*0.2} cy={s*0.22} r={s*0.06} fill={c.body} opacity="0.5" />
-            <circle cx={cx+s*0.2} cy={s*0.22} r={s*0.1} fill={c.ear} />
-            <circle cx={cx+s*0.2} cy={s*0.22} r={s*0.06} fill={c.body} opacity="0.5" />
-          </>)}
-          <circle cx={cx} cy={s*0.36} r={s*0.26} fill={c.body} />
-          {animal === 'panda' && (<>
-            <ellipse cx={cx-s*0.09} cy={s*0.34} rx={s*0.08} ry={s*0.07} fill={c.accent} opacity="0.9" />
-            <ellipse cx={cx+s*0.09} cy={s*0.34} rx={s*0.08} ry={s*0.07} fill={c.accent} opacity="0.9" />
-          </>)}
-          {blink ? (<>
-            <line x1={cx-s*0.1} y1={s*0.33} x2={cx-s*0.05} y2={s*0.33} stroke={animal==='panda'?'#fff':c.accent} strokeWidth="2" strokeLinecap="round" />
-            <line x1={cx+s*0.05} y1={s*0.33} x2={cx+s*0.1} y2={s*0.33} stroke={animal==='panda'?'#fff':c.accent} strokeWidth="2" strokeLinecap="round" />
-          </>) : (<>
-            <circle cx={cx-s*0.09} cy={s*0.33} r={s*0.04} fill={animal==='panda'?'#fff':c.accent} />
-            <circle cx={cx-s*0.085} cy={s*0.325} r={s*0.02} fill={animal==='panda'?c.accent:'#1a120b'} />
-            <circle cx={cx+s*0.09} cy={s*0.33} r={s*0.04} fill={animal==='panda'?'#fff':c.accent} />
-            <circle cx={cx+s*0.085} cy={s*0.325} r={s*0.02} fill={animal==='panda'?c.accent:'#1a120b'} />
-            <circle cx={cx-s*0.075} cy={s*0.315} r={s*0.008} fill="rgba(255,255,255,0.8)" />
-            <circle cx={cx+s*0.1} cy={s*0.315} r={s*0.008} fill="rgba(255,255,255,0.8)" />
-          </>)}
-          {animal==='fox'||animal==='cat' ? (
+          <ellipse cx={cx} cy={s * 0.68} rx={s * 0.34} ry={s * 0.3} fill={c.body} />
+          <ellipse cx={cx} cy={s * 0.72} rx={s * 0.2} ry={s * 0.2} fill={c.belly} opacity="0.8" />
+          {animal === 'bunny' ? (
+            <>
+              <ellipse cx={cx - s * 0.15} cy={s * 0.18} rx={s * 0.065} ry={s * 0.16} fill={c.body} />
+              <ellipse cx={cx - s * 0.15} cy={s * 0.18} rx={s * 0.035} ry={s * 0.11} fill={c.ear} opacity="0.6" />
+              <ellipse cx={cx + s * 0.15} cy={s * 0.18} rx={s * 0.065} ry={s * 0.16} fill={c.body} />
+              <ellipse cx={cx + s * 0.15} cy={s * 0.18} rx={s * 0.035} ry={s * 0.11} fill={c.ear} opacity="0.6" />
+            </>
+          ) : (
+            <>
+              <circle cx={cx - s * 0.2} cy={s * 0.22} r={s * 0.1} fill={c.ear} />
+              <circle cx={cx - s * 0.2} cy={s * 0.22} r={s * 0.06} fill={c.body} opacity="0.5" />
+              <circle cx={cx + s * 0.2} cy={s * 0.22} r={s * 0.1} fill={c.ear} />
+              <circle cx={cx + s * 0.2} cy={s * 0.22} r={s * 0.06} fill={c.body} opacity="0.5" />
+            </>
+          )}
+          <circle cx={cx} cy={s * 0.36} r={s * 0.26} fill={c.body} />
+          {animal === 'panda' && (
+            <>
+              <ellipse cx={cx - s * 0.09} cy={s * 0.34} rx={s * 0.08} ry={s * 0.07} fill={c.accent} opacity="0.9" />
+              <ellipse cx={cx + s * 0.09} cy={s * 0.34} rx={s * 0.08} ry={s * 0.07} fill={c.accent} opacity="0.9" />
+            </>
+          )}
+          {blink ? (
+            <>
+              <line x1={cx - s*0.1} y1={s*0.33} x2={cx - s*0.05} y2={s*0.33} stroke={animal === 'panda' ? '#fff' : c.accent} strokeWidth="2" strokeLinecap="round" />
+              <line x1={cx + s*0.05} y1={s*0.33} x2={cx + s*0.1} y2={s*0.33} stroke={animal === 'panda' ? '#fff' : c.accent} strokeWidth="2" strokeLinecap="round" />
+            </>
+          ) : (
+            <>
+              <circle cx={cx - s*0.09} cy={s*0.33} r={s*0.04} fill={animal === 'panda' ? '#fff' : c.accent} />
+              <circle cx={cx - s*0.085} cy={s*0.325} r={s*0.02} fill={animal === 'panda' ? c.accent : '#1a120b'} />
+              <circle cx={cx + s*0.09} cy={s*0.33} r={s*0.04} fill={animal === 'panda' ? '#fff' : c.accent} />
+              <circle cx={cx + s*0.085} cy={s*0.325} r={s*0.02} fill={animal === 'panda' ? c.accent : '#1a120b'} />
+              <circle cx={cx - s*0.075} cy={s*0.315} r={s*0.008} fill="rgba(255,255,255,0.8)" />
+              <circle cx={cx + s*0.1} cy={s*0.315} r={s*0.008} fill="rgba(255,255,255,0.8)" />
+            </>
+          )}
+          {animal === 'fox' || animal === 'cat' ? (
             <polygon points={`${cx},${s*0.395} ${cx-s*0.025},${s*0.375} ${cx+s*0.025},${s*0.375}`} fill={c.accent} />
           ) : (
             <ellipse cx={cx} cy={s*0.385} rx={s*0.04} ry={s*0.028} fill={c.accent} />
           )}
-          {status==='break' ? (
+          {status === 'break' ? (
             <line x1={cx-s*0.05} y1={s*0.415} x2={cx+s*0.05} y2={s*0.415} stroke={c.accent} strokeWidth="1.5" strokeLinecap="round" />
           ) : (
             <path d={`M ${cx-s*0.05} ${s*0.41} Q ${cx} ${s*0.435} ${cx+s*0.05} ${s*0.41}`} fill="none" stroke={c.accent} strokeWidth="1.5" strokeLinecap="round" />
           )}
-          {animal==='fox' && (<>
-            <line x1={cx-s*0.06} y1={s*0.385} x2={cx-s*0.22} y2={s*0.375} stroke={c.accent} strokeWidth="0.8" opacity="0.5" />
-            <line x1={cx+s*0.06} y1={s*0.385} x2={cx+s*0.22} y2={s*0.375} stroke={c.accent} strokeWidth="0.8" opacity="0.5" />
-          </>)}
-          {animal==='cat' && (<>
-            <line x1={cx-s*0.06} y1={s*0.39} x2={cx-s*0.24} y2={s*0.38} stroke={c.accent} strokeWidth="0.8" opacity="0.4" />
-            <line x1={cx-s*0.06} y1={s*0.395} x2={cx-s*0.24} y2={s*0.4} stroke={c.accent} strokeWidth="0.8" opacity="0.4" />
-            <line x1={cx+s*0.06} y1={s*0.39} x2={cx+s*0.24} y2={s*0.38} stroke={c.accent} strokeWidth="0.8" opacity="0.4" />
-            <line x1={cx+s*0.06} y1={s*0.395} x2={cx+s*0.24} y2={s*0.4} stroke={c.accent} strokeWidth="0.8" opacity="0.4" />
-          </>)}
+          {animal === 'fox' && (
+            <>
+              <line x1={cx-s*0.06} y1={s*0.385} x2={cx-s*0.22} y2={s*0.375} stroke={c.accent} strokeWidth="0.8" opacity="0.5" />
+              <line x1={cx+s*0.06} y1={s*0.385} x2={cx+s*0.22} y2={s*0.375} stroke={c.accent} strokeWidth="0.8" opacity="0.5" />
+            </>
+          )}
+          {animal === 'cat' && (
+            <>
+              <line x1={cx-s*0.06} y1={s*0.39} x2={cx-s*0.24} y2={s*0.38} stroke={c.accent} strokeWidth="0.8" opacity="0.4" />
+              <line x1={cx-s*0.06} y1={s*0.395} x2={cx-s*0.24} y2={s*0.4} stroke={c.accent} strokeWidth="0.8" opacity="0.4" />
+              <line x1={cx+s*0.06} y1={s*0.39} x2={cx+s*0.24} y2={s*0.38} stroke={c.accent} strokeWidth="0.8" opacity="0.4" />
+              <line x1={cx+s*0.06} y1={s*0.395} x2={cx+s*0.24} y2={s*0.4} stroke={c.accent} strokeWidth="0.8" opacity="0.4" />
+            </>
+          )}
           <ellipse cx={cx-s*0.35} cy={s*0.72} rx={s*0.1} ry={s*0.06} fill={c.body} transform={`rotate(-20,${cx-s*0.35},${s*0.72})`} />
           <ellipse cx={cx+s*0.35} cy={s*0.72} rx={s*0.1} ry={s*0.06} fill={c.body} transform={`rotate(20,${cx+s*0.35},${s*0.72})`} />
           <ellipse cx={cx-s*0.15} cy={s*0.95} rx={s*0.1} ry={s*0.06} fill={c.ear} />
@@ -148,6 +162,10 @@ function ElapsedTimer({ startTime }) {
   )
 }
 
+function generateRoomCode() {
+  return Math.random().toString(36).substring(2, 8).toUpperCase()
+}
+
 export default function StudyRoom({ session }) {
   const [presence, setPresence] = useState([])
   const [username, setUsername] = useState('')
@@ -170,51 +188,65 @@ export default function StudyRoom({ session }) {
   const [inviteError, setInviteError] = useState('')
   const [inviteSent, setInviteSent] = useState(false)
   const [showInvitePanel, setShowInvitePanel] = useState(false)
+  const [roomMode, setRoomMode] = useState('global') // 'global' | 'private'
   const pingRef = useRef(null)
-  const inviteRef = useRef(null)
   const channelRef = useRef(null)
   const typingRef = useRef(null)
   const endRef = useRef(null)
-  const msgEndRef = useRef(null)
 
   useEffect(() => {
     fetchProfile()
-    fetchMessages('global')
+    fetchMessages()
     fetchInvites()
-    inviteRef.current = setInterval(() => fetchInvites(), 10000)
+    const cleanupInvites = setupInviteListener()
     return () => {
-      clearInterval(inviteRef.current)
-      clearInterval(pingRef.current)
+      cleanupInvites?.()
+      leaveRoom()
+      if (channelRef.current) supabase.removeChannel(channelRef.current)
+    }
+    return () => {
       leaveRoom()
       if (channelRef.current) supabase.removeChannel(channelRef.current)
     }
   }, [])
 
-  useEffect(() => { msgEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
   async function fetchProfile() {
     const { data } = await supabase.from('profiles').select('username, name, avatar_animal').eq('id', session.user.id).single()
     if (data?.username) setUsername(data.username)
-    else if (data?.name) setUsername(data.name.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'').slice(0,24))
+    else if (data?.name) {
+      const base = data.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '').slice(0, 24)
+      setUsername(base)
+    }
     if (data?.avatar_animal) setMyAnimal(data.avatar_animal)
   }
 
-  async function fetchMessages(roomCode) {
-    const { data } = await supabase.from('study_room_messages').select('*').eq('room_code', roomCode).order('created_at', { ascending: true }).limit(100)
+  async function fetchMessages(roomCode = null) {
+    let q = supabase.from('study_room_messages').select('*').order('created_at', { ascending: true }).limit(100)
+    if (roomCode) q = q.eq('room_code', roomCode)
+    else q = q.eq('room_code', 'global')
+    const { data } = await q
     setMessages(data || [])
   }
 
   async function fetchInvites() {
-    const { data } = await supabase.from('study_room_invites').select('*').eq('to_user_id', session.user.id).eq('status', 'pending').order('created_at', { ascending: false })
+    const { data } = await supabase.from('study_room_invites')
+      .select('*').eq('to_user_id', session.user.id).eq('status', 'pending')
+      .order('created_at', { ascending: false })
     setInvites(data || [])
   }
 
-  async function fetchPresence(roomCode) {
-    const cutoff = new Date(Date.now() - 5 * 60 * 1000).toISOString()
-    let q = supabase.from('study_room_presence').select('*').gte('last_seen', cutoff).order('last_seen', { ascending: false })
-    if (roomCode && roomCode !== 'global') q = q.eq('room_code', roomCode)
-    const { data } = await q
-    setPresence(data || [])
+  function setupInviteListener() {
+    const iv = setInterval(() => fetchInvites(), 10000)
+    return () => clearInterval(iv)
+  }
+    channel.subscribe((status) => {
+      if (status === 'CHANNEL_ERROR') {
+        console.log('Invite listener failed — falling back to polling')
+        setInterval(() => fetchInvites(), 15000)
+      }
+    })
   }
 
   function setupRealtime(roomCode) {
@@ -229,18 +261,32 @@ export default function StudyRoom({ session }) {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'study_room_messages' }, (payload) => {
         if (payload.new.room_code === roomCode) setMessages(prev => [...prev, payload.new])
       })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'study_room_presence', filter: `room_code=eq.${roomCode}` }, () => {
+        fetchPresence(roomCode)
+      })
       .subscribe()
     channelRef.current = channel
 
-    clearInterval(pingRef.current)
+    // Poll presence every 5s as fallback — ensures people appear even if realtime misses
+    if (pingRef.current) clearInterval(pingRef.current)
     pingRef.current = setInterval(async () => {
-      await supabase.from('study_room_presence').update({ last_seen: new Date().toISOString(), status }).eq('user_id', session.user.id)
+      await supabase.from('study_room_presence').update({
+        last_seen: new Date().toISOString(), status
+      }).eq('user_id', session.user.id)
       fetchPresence(roomCode)
     }, 5000)
   }
 
+  async function fetchPresence(roomCode = null) {
+    const cutoff = new Date(Date.now() - 5 * 60 * 1000).toISOString()
+    let q = supabase.from('study_room_presence').select('*').gte('last_seen', cutoff).order('last_seen', { ascending: false })
+    if (roomCode && roomCode !== 'global') q = q.eq('room_code', roomCode)
+    const { data } = await q
+    setPresence(data || [])
+  }
+
   async function saveUsername() {
-    const u = newUsername.trim().toLowerCase().replace(/[^a-z0-9_]/g,'_').slice(0,24)
+    const u = newUsername.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 24)
     if (!u) { setUsernameError('Enter a username'); return }
     const { data: existing } = await supabase.from('profiles').select('id').eq('username', u).neq('id', session.user.id).single()
     if (existing) { setUsernameError('That username is taken'); return }
@@ -251,6 +297,7 @@ export default function StudyRoom({ session }) {
   async function enterRoom(roomCode) {
     const code = roomCode || 'global'
     setMyRoomCode(code)
+    setRoomMode(code === 'global' ? 'global' : 'private')
     await supabase.from('profiles').update({ avatar_animal: myAnimal }).eq('id', session.user.id)
     await supabase.from('study_room_presence').upsert({
       user_id: session.user.id, username, status, subject: subject || null,
@@ -272,9 +319,12 @@ export default function StudyRoom({ session }) {
     if (!inviteUsername.trim()) return
     setInviteError('')
     const { data: target } = await supabase.from('profiles').select('id, username').eq('username', inviteUsername.trim().toLowerCase()).single()
-    if (!target) { setInviteError('User not found'); return }
-    if (target.id === session.user.id) { setInviteError('Can\'t invite yourself'); return }
-    await supabase.from('study_room_invites').insert({ room_code: myRoomCode, from_user_id: session.user.id, from_username: username, to_user_id: target.id, to_username: target.username })
+    if (!target) { setInviteError('User not found — check the username'); return }
+    if (target.id === session.user.id) { setInviteError('You can\'t invite yourself'); return }
+    await supabase.from('study_room_invites').insert({
+      room_code: myRoomCode, from_user_id: session.user.id,
+      from_username: username, to_user_id: target.id, to_username: target.username
+    })
     setInviteSent(true); setInviteUsername('')
     setTimeout(() => setInviteSent(false), 3000)
   }
@@ -282,7 +332,6 @@ export default function StudyRoom({ session }) {
   async function acceptInvite(invite) {
     await supabase.from('study_room_invites').update({ status: 'accepted' }).eq('id', invite.id)
     setInvites(p => p.filter(i => i.id !== invite.id))
-    setMyRoomCode(invite.room_code)
     setSetupStep('status')
     setJoinCode(invite.room_code)
   }
@@ -297,11 +346,14 @@ export default function StudyRoom({ session }) {
     if (!msgInput.trim() || !inRoom) return
     const msg = msgInput.trim()
     setMsgInput(''); broadcastTyping(false)
-    await supabase.from('study_room_messages').insert({ user_id: session.user.id, username, message: msg, avatar_animal: myAnimal, room_code: myRoomCode })
+    await supabase.from('study_room_messages').insert({
+      user_id: session.user.id, username, message: msg, avatar_animal: myAnimal, room_code: myRoomCode
+    })
   }
 
   function broadcastTyping(typing) {
-    channelRef.current?.send({ type: 'broadcast', event: 'typing', payload: { user_id: session.user.id, username, typing } })
+    if (!channelRef.current) return
+    channelRef.current.send({ type: 'broadcast', event: 'typing', payload: { user_id: session.user.id, username, typing } })
   }
 
   function handleTyping(e) {
@@ -316,12 +368,15 @@ export default function StudyRoom({ session }) {
   const activeTypers = Object.values(typingUsers).filter(u => u.typing)
   const iStyle = { width: '100%', background: 'var(--base-700)', border: '0.5px solid var(--base-600)', borderRadius: '10px', padding: '9px 14px', color: 'var(--cream-200)', fontSize: '13px', fontFamily: 'var(--font-sans)', outline: 'none', boxSizing: 'border-box' }
 
+  // ─── INVITE NOTIFICATIONS (always visible) ───────────────────────────
   const InviteToasts = () => invites.length > 0 ? (
     <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px' }}>
       {invites.map(inv => (
-        <div key={inv.id} style={{ background: 'var(--base-800)', border: '1px solid var(--gold-300)', borderRadius: '14px', padding: '14px 18px', width: '300px', boxShadow: '0 0 40px rgba(201,168,124,0.3)', animation: 'toastIn 0.4s ease' }}>
+        <div key={inv.id} style={{ background: 'var(--base-800)', border: '1px solid var(--gold-300)', borderRadius: '14px', padding: '14px 18px', width: '300px', boxShadow: '0 0 40px rgba(201,168,124,0.3)', animation: 'toastIn 0.4s cubic-bezier(0.34,1.56,0.64,1)' }}>
           <p style={{ fontSize: '11px', color: 'var(--gold-300)', fontFamily: 'var(--font-sans)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Study invite ✦</p>
-          <p style={{ fontSize: '13px', color: 'var(--cream-200)', fontFamily: 'var(--font-sans)', marginBottom: '12px' }}><strong>@{inv.from_username}</strong> wants to study together</p>
+          <p style={{ fontSize: '13px', color: 'var(--cream-200)', fontFamily: 'var(--font-sans)', marginBottom: '12px' }}>
+            <strong>@{inv.from_username}</strong> invited you to study together
+          </p>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={() => acceptInvite(inv)} style={{ flex: 2, padding: '8px', background: 'var(--gold-300)', border: 'none', borderRadius: '8px', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '12px', fontWeight: 500, color: 'var(--base-950)' }}>Join room ✦</button>
             <button onClick={() => declineInvite(inv)} style={{ flex: 1, padding: '8px', background: 'transparent', border: '0.5px solid var(--base-600)', borderRadius: '8px', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '12px', color: 'var(--muted)' }}>Decline</button>
@@ -331,14 +386,17 @@ export default function StudyRoom({ session }) {
     </div>
   ) : null
 
+  // ─── SETUP FLOW ───────────────────────────────────────────────────────
   if (!inRoom) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px', background: 'var(--base-950)' }}>
       <InviteToasts />
       <div style={{ maxWidth: '540px', width: '100%' }}>
+
+        {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '36px' }}>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '20px' }}>
-            {ANIMALS.slice(0,3).map((a,i) => (
-              <div key={a} style={{ animation: `floatAnim ${2+i*0.4}s ease-in-out infinite`, animationDelay: `${i*0.3}s` }}>
+            {ANIMALS.slice(0, 3).map((a, i) => (
+              <div key={a} style={{ animation: `floatAnim ${2 + i * 0.4}s ease-in-out infinite`, animationDelay: `${i * 0.3}s` }}>
                 <Animal animal={a} size={55} status="focusing" name="" />
               </div>
             ))}
@@ -347,6 +405,7 @@ export default function StudyRoom({ session }) {
           <p style={{ color: 'var(--muted)', fontSize: '13px', fontFamily: 'var(--font-sans)', lineHeight: 1.7 }}>Focus together. You work harder when others can see you working.</p>
         </div>
 
+        {/* Username step */}
         {(setupStep === 'entry' || setupStep === 'username') && (
           <div style={{ background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: '20px', padding: '24px', marginBottom: '14px' }}>
             {username && setupStep === 'entry' ? (
@@ -370,16 +429,17 @@ export default function StudyRoom({ session }) {
           </div>
         )}
 
+        {/* Animal step */}
         {setupStep === 'animal' && (
           <div style={{ background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: '20px', padding: '24px', marginBottom: '14px' }}>
             <p style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-sans)', marginBottom: '16px' }}>Pick your character</p>
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '16px' }}>
               {ANIMALS.map(a => {
-                const ac = ANIMAL_COLORS[a]
+                const c = ANIMAL_COLORS[a]
                 return (
-                  <button key={a} onClick={() => setMyAnimal(a)} style={{ background: myAnimal===a ? ac.body+'33' : 'var(--base-700)', border: `1.5px solid ${myAnimal===a ? ac.body : 'var(--base-600)'}`, borderRadius: '12px', padding: '8px 12px', cursor: 'pointer', transition: 'all 0.2s' }}>
+                  <button key={a} onClick={() => setMyAnimal(a)} style={{ background: myAnimal === a ? c.body + '33' : 'var(--base-700)', border: `1.5px solid ${myAnimal === a ? c.body : 'var(--base-600)'}`, borderRadius: '12px', padding: '8px 12px', cursor: 'pointer', transition: 'all 0.2s' }}>
                     <Animal animal={a} size={40} status="focusing" name="" />
-                    <span style={{ fontSize: '9px', color: myAnimal===a ? ac.body : 'var(--muted)', fontFamily: 'var(--font-sans)', textTransform: 'capitalize', display: 'block', marginTop: '4px' }}>{a}</span>
+                    <span style={{ fontSize: '9px', color: myAnimal === a ? c.body : 'var(--muted)', fontFamily: 'var(--font-sans)', textTransform: 'capitalize', display: 'block', marginTop: '4px' }}>{a}</span>
                   </button>
                 )
               })}
@@ -388,31 +448,44 @@ export default function StudyRoom({ session }) {
           </div>
         )}
 
+        {/* Room step — global or private */}
         {setupStep === 'room' && (
           <div style={{ background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: '20px', padding: '24px', marginBottom: '14px' }}>
             <p style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-sans)', marginBottom: '16px' }}>Choose your room</p>
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-              <button onClick={() => { setMyRoomCode('global'); setSetupStep('status') }} style={{ flex: 1, padding: '16px', background: 'var(--base-700)', border: '0.5px solid var(--gold-300)', borderRadius: '12px', cursor: 'pointer', textAlign: 'center' }}>
+              <button onClick={() => setSetupStep('status')} style={{ flex: 1, padding: '16px', background: 'var(--base-700)', border: '0.5px solid var(--gold-300)', borderRadius: '12px', cursor: 'pointer', textAlign: 'center' }}>
                 <div style={{ fontSize: '24px', marginBottom: '6px' }}>🌍</div>
                 <p style={{ fontSize: '13px', color: 'var(--cream-200)', fontFamily: 'var(--font-sans)', fontWeight: 500, marginBottom: '3px' }}>Global room</p>
-                <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>Study with anyone</p>
+                <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>Study with anyone on EVOLVE</p>
               </button>
-              <button onClick={() => { setMyRoomCode(Math.random().toString(36).substring(2,8).toUpperCase()); setSetupStep('status') }} style={{ flex: 1, padding: '16px', background: 'var(--base-700)', border: '0.5px solid var(--base-600)', borderRadius: '12px', cursor: 'pointer', textAlign: 'center' }}>
+              <button onClick={() => {
+                const code = generateRoomCode()
+                setMyRoomCode(code)
+                setSetupStep('status')
+              }} style={{ flex: 1, padding: '16px', background: 'var(--base-700)', border: '0.5px solid var(--base-600)', borderRadius: '12px', cursor: 'pointer', textAlign: 'center' }}>
                 <div style={{ fontSize: '24px', marginBottom: '6px' }}>🔒</div>
                 <p style={{ fontSize: '13px', color: 'var(--cream-200)', fontFamily: 'var(--font-sans)', fontWeight: 500, marginBottom: '3px' }}>Private room</p>
-                <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>Invite friends only</p>
+                <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>Invite friends by username</p>
               </button>
             </div>
+
+            {/* Join with code */}
             <div style={{ borderTop: '0.5px solid var(--base-700)', paddingTop: '16px' }}>
-              <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', marginBottom: '8px' }}>Or join with a code:</p>
+              <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', marginBottom: '8px' }}>Or join a room with a code:</p>
               <div style={{ display: 'flex', gap: '8px' }}>
-                <input value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase())} placeholder="ROOM CODE" style={{ ...iStyle, flex: 1, letterSpacing: '0.1em' }} maxLength={6} />
-                <button onClick={() => { if (joinCode.length===6) { setMyRoomCode(joinCode); setSetupStep('status') } }} style={{ padding: '9px 16px', background: 'var(--gold-300)', border: 'none', borderRadius: '10px', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '12px', fontWeight: 500, color: 'var(--base-950)' }}>Join →</button>
+                <input value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase())} placeholder="ROOM CODE" style={{ ...iStyle, flex: 1, textTransform: 'uppercase', letterSpacing: '0.1em' }} maxLength={6} />
+                <button onClick={() => {
+                  if (joinCode.length === 6) {
+                    setMyRoomCode(joinCode)
+                    setSetupStep('status')
+                  }
+                }} style={{ padding: '9px 16px', background: 'var(--gold-300)', border: 'none', borderRadius: '10px', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '12px', fontWeight: 500, color: 'var(--base-950)', whiteSpace: 'nowrap' }}>Join →</button>
               </div>
             </div>
           </div>
         )}
 
+        {/* Status + enter */}
         {setupStep === 'status' && (
           <div style={{ background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: '20px', padding: '24px', marginBottom: '14px' }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
@@ -420,15 +493,15 @@ export default function StudyRoom({ session }) {
             </div>
             {myRoomCode && myRoomCode !== 'global' && (
               <div style={{ background: 'var(--base-700)', borderRadius: '10px', padding: '10px 14px', marginBottom: '16px', textAlign: 'center' }}>
-                <p style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', marginBottom: '4px' }}>Room code — share with friends</p>
+                <p style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', marginBottom: '4px' }}>Your room code — share with friends</p>
                 <p style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', fontStyle: 'italic', color: 'var(--gold-300)', letterSpacing: '0.15em' }}>{myRoomCode}</p>
               </div>
             )}
-            <div style={{ marginBottom: '14px' }}>
+            <div style={{ marginBottom: '16px' }}>
               <p style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-sans)', marginBottom: '8px' }}>Status</p>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                 {STATUS_OPTIONS.map(s => (
-                  <button key={s.id} onClick={() => setStatus(s.id)} style={{ padding: '6px 14px', borderRadius: '99px', border: `0.5px solid ${status===s.id ? s.color : 'var(--base-600)'}`, background: status===s.id ? s.color+'22' : 'transparent', color: status===s.id ? s.color : 'var(--muted)', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '12px' }}>
+                  <button key={s.id} onClick={() => setStatus(s.id)} style={{ padding: '6px 14px', borderRadius: '99px', border: `0.5px solid ${status === s.id ? s.color : 'var(--base-600)'}`, background: status === s.id ? s.color + '22' : 'transparent', color: status === s.id ? s.color : 'var(--muted)', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '12px', transition: 'all 0.15s' }}>
                     {s.icon} {s.label}
                   </button>
                 ))}
@@ -444,27 +517,34 @@ export default function StudyRoom({ session }) {
           </div>
         )}
 
+        {/* Who's online preview */}
         {presence.length > 0 && (
           <div style={{ background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: '14px', padding: '16px', textAlign: 'center' }}>
-            <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', marginBottom: '10px' }}>{presence.length} focusing right now</p>
+            <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', marginBottom: '10px' }}>{presence.length} focusing right now globally</p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
-              {presence.slice(0,5).map(p => <Animal key={p.user_id} animal={p.avatar_animal||'bear'} size={36} status={p.status} name={p.username} />)}
+              {presence.slice(0, 5).map(p => <Animal key={p.user_id} animal={p.avatar_animal || 'bear'} size={36} status={p.status} name={p.username} />)}
             </div>
           </div>
         )}
       </div>
+
       <style>{`
-        @keyframes floatAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-        @keyframes typingDot{0%,100%{transform:translateY(0);opacity:0.4}50%{transform:translateY(-4px);opacity:1}}
-        @keyframes toastIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes floatAnim { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        @keyframes typingDot { 0%,100%{transform:translateY(0);opacity:0.4} 50%{transform:translateY(-4px);opacity:1} }
+        @keyframes toastIn { from{opacity:0;transform:translateX(16px)} to{opacity:1;transform:translateX(0)} }
       `}</style>
     </div>
   )
 
+  // ─── IN ROOM ─────────────────────────────────────────────────────────
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', height: '100vh', overflow: 'hidden' }}>
       <InviteToasts />
+
+      {/* MAIN */}
       <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
+        {/* Top bar */}
         <div style={{ padding: '12px 20px', borderBottom: '0.5px solid var(--base-600)', background: 'var(--base-900)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, gap: '12px', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#a8c4a0', boxShadow: '0 0 8px #a8c4a0', animation: 'orbPulse 2s infinite' }} />
@@ -473,14 +553,21 @@ export default function StudyRoom({ session }) {
             </span>
             <span style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>· {presence.length} focusing</span>
           </div>
+
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+            {/* Invite button (private rooms only) */}
             {myRoomCode && myRoomCode !== 'global' && (
               <button onClick={() => setShowInvitePanel(p => !p)} style={{ padding: '5px 12px', borderRadius: '8px', border: '0.5px solid var(--gold-300)', background: 'rgba(201,168,124,0.1)', color: 'var(--gold-300)', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '11px' }}>
                 + Invite friend
               </button>
             )}
+            {/* Status pills */}
             {STATUS_OPTIONS.map(s => (
-              <button key={s.id} onClick={async () => { setStatus(s.id); await supabase.from('study_room_presence').update({ status: s.id }).eq('user_id', session.user.id); fetchPresence(myRoomCode) }} style={{ padding: '4px 10px', borderRadius: '99px', border: `0.5px solid ${status===s.id ? s.color : 'var(--base-600)'}`, background: status===s.id ? s.color+'22' : 'transparent', color: status===s.id ? s.color : 'var(--muted)', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '10px' }}>
+              <button key={s.id} onClick={async () => {
+                setStatus(s.id)
+                await supabase.from('study_room_presence').update({ status: s.id }).eq('user_id', session.user.id)
+                fetchPresence(myRoomCode)
+              }} style={{ padding: '4px 10px', borderRadius: '99px', border: `0.5px solid ${status === s.id ? s.color : 'var(--base-600)'}`, background: status === s.id ? s.color + '22' : 'transparent', color: status === s.id ? s.color : 'var(--muted)', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '10px' }}>
                 {s.icon} {s.label}
               </button>
             ))}
@@ -488,11 +575,12 @@ export default function StudyRoom({ session }) {
           </div>
         </div>
 
+        {/* Invite panel */}
         {showInvitePanel && (
           <div style={{ padding: '14px 20px', background: 'var(--base-800)', borderBottom: '0.5px solid var(--base-600)', display: 'flex', gap: '10px', alignItems: 'center', flexShrink: 0 }}>
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', marginBottom: '6px' }}>
-                Room code: <strong style={{ color: 'var(--gold-300)', letterSpacing: '0.1em' }}>{myRoomCode}</strong> — or invite by username:
+                Room code: <strong style={{ color: 'var(--gold-300)', letterSpacing: '0.1em' }}>{myRoomCode}</strong> — invite by username below
               </p>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <input value={inviteUsername} onChange={e => setInviteUsername(e.target.value)} placeholder="their_username" style={{ flex: 1, background: 'var(--base-700)', border: '0.5px solid var(--base-600)', borderRadius: '8px', padding: '7px 12px', color: 'var(--cream-200)', fontSize: '12px', fontFamily: 'var(--font-sans)', outline: 'none' }} onKeyDown={e => e.key === 'Enter' && sendInvite()} />
@@ -506,23 +594,30 @@ export default function StudyRoom({ session }) {
           </div>
         )}
 
+        {/* Characters + timer */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '36px', padding: '32px', overflowY: 'auto' }}>
           <ElapsedTimer startTime={sessionStart} />
+
           <div style={{ display: 'flex', gap: '28px', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'flex-end' }}>
+            {/* Me */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
               <div style={{ animation: 'breathe 4s ease-in-out infinite' }}>
                 <Animal animal={myAnimal} size={100} isTyping={isTyping} status={status} name={username} />
               </div>
               {subject && <p style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontStyle: 'italic', maxWidth: '100px', textAlign: 'center' }}>{subject}</p>}
             </div>
+
+            {/* Others */}
             {others.map((p, i) => (
               <div key={p.user_id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                <div style={{ animation: `breathe ${3.5+i*0.5}s ease-in-out infinite`, animationDelay: `${i*0.8}s` }}>
-                  <Animal animal={p.avatar_animal||'cat'} size={88} isTyping={!!typingUsers[p.user_id]?.typing} status={p.status} name={p.username} />
+                <div style={{ animation: `breathe ${3.5 + i * 0.5}s ease-in-out infinite`, animationDelay: `${i * 0.8}s` }}>
+                  <Animal animal={p.avatar_animal || 'cat'} size={88} isTyping={!!typingUsers[p.user_id]?.typing} status={p.status} name={p.username} />
                 </div>
                 {p.subject && <p style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontStyle: 'italic', maxWidth: '100px', textAlign: 'center' }}>{p.subject}</p>}
               </div>
             ))}
+
+            {/* Empty spot hint */}
             {presence.length < 2 && myRoomCode && myRoomCode !== 'global' && (
               <div style={{ opacity: 0.3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                 <div style={{ width: '80px', height: '88px', borderRadius: '16px', border: '1.5px dashed var(--base-600)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -532,6 +627,7 @@ export default function StudyRoom({ session }) {
               </div>
             )}
           </div>
+
           {activeTypers.length > 0 && (
             <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontStyle: 'italic' }}>
               {activeTypers.map(t => `@${t.username}`).join(', ')} {activeTypers.length === 1 ? 'is' : 'are'} typing...
@@ -540,19 +636,23 @@ export default function StudyRoom({ session }) {
         </div>
       </div>
 
+      {/* CHAT */}
       <div style={{ borderLeft: '0.5px solid var(--base-600)', background: 'var(--base-900)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '16px', borderBottom: '0.5px solid var(--base-700)', flexShrink: 0 }}>
           <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Room chat</p>
         </div>
+
         <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {messages.length === 0 && <p style={{ fontSize: '12px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontStyle: 'italic', textAlign: 'center', padding: '20px 0' }}>no messages yet ✦<br />say hi!</p>}
+          {messages.length === 0 && (
+            <p style={{ fontSize: '12px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontStyle: 'italic', textAlign: 'center', padding: '20px 0' }}>no messages yet ✦<br />say hi!</p>
+          )}
           {messages.map(msg => {
             const isMe = msg.user_id === session.user.id
-            const mc = ANIMAL_COLORS[msg.avatar_animal||'bear']
-            const emoji = {bear:'🐻',cat:'🐱',fox:'🦊',panda:'🐼',bunny:'🐰'}[msg.avatar_animal]||'🐻'
+            const c = ANIMAL_COLORS[msg.avatar_animal || 'bear']
+            const emoji = { bear: '🐻', cat: '🐱', fox: '🦊', panda: '🐼', bunny: '🐰' }[msg.avatar_animal] || '🐻'
             return (
               <div key={msg.id} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', flexDirection: isMe ? 'row-reverse' : 'row' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: mc.body+'44', border: `1px solid ${mc.body}66`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', flexShrink: 0 }}>{emoji}</div>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: c.body + '44', border: `1px solid ${c.body}66`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', flexShrink: 0 }}>{emoji}</div>
                 <div style={{ maxWidth: '75%' }}>
                   {!isMe && <p style={{ fontSize: '9px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', marginBottom: '3px' }}>@{msg.username}</p>}
                   <div style={{ padding: '8px 12px', borderRadius: isMe ? '12px 12px 4px 12px' : '4px 12px 12px 12px', background: isMe ? 'var(--gold-300)' : 'var(--base-800)', border: isMe ? 'none' : '0.5px solid var(--base-600)' }}>
@@ -563,11 +663,12 @@ export default function StudyRoom({ session }) {
               </div>
             )
           })}
-          <div ref={msgEndRef} />
+          <div ref={endRef} />
         </div>
+
         <div style={{ padding: '12px', borderTop: '0.5px solid var(--base-700)', flexShrink: 0 }}>
           <form onSubmit={sendMessage} style={{ display: 'flex', gap: '8px' }}>
-            <input value={msgInput} onChange={handleTyping} placeholder="say something..." style={{ flex: 1, background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: '10px', padding: '9px 14px', color: 'var(--cream-200)', fontSize: '13px', fontFamily: 'var(--font-sans)', outline: 'none' }} onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage(e)} />
+            <input ref={endRef} value={msgInput} onChange={handleTyping} placeholder="say something..." style={{ flex: 1, background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: '10px', padding: '9px 14px', color: 'var(--cream-200)', fontSize: '13px', fontFamily: 'var(--font-sans)', outline: 'none' }} onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage(e)} />
             <button type="submit" disabled={!msgInput.trim()} style={{ padding: '9px 14px', background: msgInput.trim() ? 'var(--gold-300)' : 'var(--base-700)', border: 'none', borderRadius: '10px', cursor: msgInput.trim() ? 'pointer' : 'default', color: msgInput.trim() ? 'var(--base-950)' : 'var(--muted)', transition: 'all 0.2s' }}>↗</button>
           </form>
           <p style={{ fontSize: '9px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', marginTop: '6px', textAlign: 'center' }}>✦ social facilitation — you focus harder when others see you</p>
@@ -575,11 +676,12 @@ export default function StudyRoom({ session }) {
       </div>
 
       <style>{`
-        @keyframes breathe{0%,100%{transform:scaleY(1) translateY(0)}50%{transform:scaleY(1.02) translateY(-3px)}}
-        @keyframes orbPulse{0%,100%{opacity:1}50%{opacity:0.3}}
-        @keyframes typingDot{0%,100%{transform:translateY(0);opacity:0.4}50%{transform:translateY(-4px);opacity:1}}
-        @keyframes toastIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes breathe { 0%,100%{transform:scaleY(1) translateY(0)} 50%{transform:scaleY(1.02) translateY(-3px)} }
+        @keyframes orbPulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        @keyframes typingDot { 0%,100%{transform:translateY(0);opacity:0.4} 50%{transform:translateY(-4px);opacity:1} }
+        @keyframes toastIn { from{opacity:0;transform:translateX(16px)} to{opacity:1;transform:translateX(0)} }
       `}</style>
     </div>
   )
 }
+
