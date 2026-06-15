@@ -264,8 +264,15 @@ export default function StudyRoom({ session }) {
 
   async function leaveRoom() {
     clearInterval(pingRef.current)
-    setInRoom(false); setSessionStart(null)
-    if (session?.user?.id) await supabase.from('study_room_presence').delete().eq('user_id', session.user.id)
+    setInRoom(false)
+    setSessionStart(null)
+    try {
+      if (session?.user?.id) {
+        await supabase.from('study_room_presence').delete().eq('user_id', session.user.id)
+      }
+    } catch (e) {
+      // ignore cleanup errors
+    }
   }
 
   async function sendInvite() {
