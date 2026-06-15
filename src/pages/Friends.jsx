@@ -14,10 +14,41 @@ export default function Friends({ session, setActivePage }) {
 
   useEffect(() => { fetchAll() }, [])
 
-  async function fetchAll() {
+ async function fetchAll() {
     const uid = session.user.id
     const { data: profile } = await supabase.from('profiles').select('username').eq('id', uid).single()
     if (profile?.username) setMyUsername(profile.username)
+
+    // Fetch study invites
+    const { data: invs } = await supabase.from('study_room_invites')
+      .select('*').eq('to_user_id', uid).eq('status', 'pending')
+    setStudyInvites(invs || [])
+
+    // Fetch friendships
+    const { data: fs } = await supabase.from('friendships')
+      .select('id, status, requester_id, addressee_id')
+      .or(`requester_id.eq.${uid},addressee_id.eq.${uid}`)
+
+    if (!fs || fs.length === 0) return
+
+    // Fetch all friend profiles separately
+    const otherIds = fs.map(f => f.requester_id === uid ? f.addressee_id : f.requester_id)
+    const { data: friendProfiles } = await supabase.from('profiles')
+      .select('id, name, username, avatar_animal')
+      .in('id', otherIds)
+
+    const profileMap = {}
+    ;(friendProfiles || []).forEach(p => { profileMap[p.id] = p })
+
+    const enriched = fs.map(f => ({
+      ...f,
+      friend: profileMap[f.requester_id === uid ? f.addressee_id : f.requester_id]
+    }))
+
+    setFriends(enriched.filter(f => f.status === 'accepted'))
+    setPending(enriched.filter(f => f.status === 'pending' && f.requester_id === uid))
+    setIncoming(enriched.filter(f => f.status === 'pending' && f.addressee_id === uid))
+  }
 
     const { data: fs } = await supabase.from('friendships').select(`
       id, status, requester_id, addressee_id,
@@ -48,7 +79,10 @@ export default function Friends({ session, setActivePage }) {
   async function searchUser() {
     if (!search.trim()) return
     setSearching(true); setSearchError(''); setSearchResult(null)
-    const { data } = await supabase.from('profiles').select('id, name, username, avatar_animal').eq('username', search.trim().toLowerCase()).single()
+    const { data } = await supabase.from('profiles')
+      .select('id, name, username, avatar_animal')
+      .eq('username', search.trim().toLowerCase())
+      .maybeSingle()
     if (!data) { setSearchError('No user found with that username'); setSearching(false); return }
     if (data.id === session.user.id) { setSearchError('That\'s you!'); setSearching(false); return }
     setSearchResult(data); setSearching(false)
