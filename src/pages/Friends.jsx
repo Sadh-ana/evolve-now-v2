@@ -14,24 +14,21 @@ export default function Friends({ session, setActivePage }) {
 
   useEffect(() => { fetchAll() }, [])
 
- async function fetchAll() {
+  async function fetchAll() {
     const uid = session.user.id
     const { data: profile } = await supabase.from('profiles').select('username').eq('id', uid).single()
     if (profile?.username) setMyUsername(profile.username)
 
-    // Fetch study invites
     const { data: invs } = await supabase.from('study_room_invites')
       .select('*').eq('to_user_id', uid).eq('status', 'pending')
     setStudyInvites(invs || [])
 
-    // Fetch friendships
     const { data: fs } = await supabase.from('friendships')
       .select('id, status, requester_id, addressee_id')
       .or(`requester_id.eq.${uid},addressee_id.eq.${uid}`)
 
     if (!fs || fs.length === 0) return
 
-    // Fetch all friend profiles separately
     const otherIds = fs.map(f => f.requester_id === uid ? f.addressee_id : f.requester_id)
     const { data: friendProfiles } = await supabase.from('profiles')
       .select('id, name, username, avatar_animal')
@@ -48,32 +45,6 @@ export default function Friends({ session, setActivePage }) {
     setFriends(enriched.filter(f => f.status === 'accepted'))
     setPending(enriched.filter(f => f.status === 'pending' && f.requester_id === uid))
     setIncoming(enriched.filter(f => f.status === 'pending' && f.addressee_id === uid))
-  }
-
-    const { data: fs } = await supabase.from('friendships').select(`
-      id, status, requester_id, addressee_id,
-      requester:profiles!friendships_requester_id_fkey(id, name, username, avatar_animal),
-      addressee:profiles!friendships_addressee_id_fkey(id, name, username, avatar_animal)
-    `).or(`requester_id.eq.${uid},addressee_id.eq.${uid}`)
-
-    const accepted = (fs || []).filter(f => f.status === 'accepted').map(f => ({
-      ...f, friend: f.requester_id === uid ? f.addressee : f.requester
-    }))
-    const pend = (fs || []).filter(f => f.status === 'pending' && f.requester_id === uid).map(f => ({
-      ...f, friend: f.addressee
-    }))
-    const inc = (fs || []).filter(f => f.status === 'pending' && f.addressee_id === uid).map(f => ({
-      ...f, friend: f.requester
-    }))
-
-    setFriends(accepted)
-    setPending(pend)
-    setIncoming(inc)
-
-    // Study invites from friends
-    const { data: invs } = await supabase.from('study_room_invites')
-      .select('*').eq('to_user_id', uid).eq('status', 'pending')
-    setStudyInvites(invs || [])
   }
 
   async function searchUser() {
@@ -117,14 +88,12 @@ export default function Friends({ session, setActivePage }) {
       to_user_id: friend.id,
       to_username: friend.username,
     })
-    alert(`Invite sent! When they accept, both join room: ${roomCode}\n\nYour room code: ${roomCode}\nGo to Study Room and enter this code.`)
+    alert(`Invite sent! Room code: ${roomCode}\nGo to Study Room and enter this code.`)
   }
 
   async function acceptStudyInvite(inv) {
     await supabase.from('study_room_invites').update({ status: 'accepted' }).eq('id', inv.id)
     setStudyInvites(p => p.filter(i => i.id !== inv.id))
-    // Store room code for study room
-    localStorage.setItem('pendingRoomCode', inv.room_code)
     if (setActivePage) setActivePage('studyroom')
   }
 
@@ -134,13 +103,13 @@ export default function Friends({ session, setActivePage }) {
   }
 
   const animalEmoji = a => ({ bear: '🐻', cat: '🐱', fox: '🦊', panda: '🐼', bunny: '🐰' }[a] || '🐻')
-
   const card = { background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: '14px', padding: '1rem 1.25rem' }
   const iStyle = { background: 'var(--base-700)', border: '0.5px solid var(--base-600)', borderRadius: '10px', padding: '9px 14px', color: 'var(--cream-200)', fontSize: '13px', fontFamily: 'var(--font-sans)', outline: 'none' }
 
   return (
     <div style={{ padding: '32px', maxWidth: '800px' }}>
       <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontStyle: 'italic', color: 'var(--cream-200)', marginBottom: '4px' }}>Friends</h2>
+
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px', padding: '12px 16px', background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: '12px', width: 'fit-content' }}>
         <div>
           <p style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '3px' }}>Your username — share this with friends</p>
@@ -149,8 +118,7 @@ export default function Friends({ session, setActivePage }) {
         <button onClick={() => navigator.clipboard.writeText(myUsername)} style={{ padding: '7px 14px', background: 'transparent', border: '0.5px solid var(--base-600)', borderRadius: '8px', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '11px', color: 'var(--muted)' }}>Copy</button>
         {!myUsername && <span style={{ fontSize: '11px', color: 'var(--rose-300)', fontFamily: 'var(--font-sans)' }}>← set in Settings first</span>}
       </div>
-      
-      {/* Study invites */}
+
       {studyInvites.length > 0 && (
         <div style={{ marginBottom: '24px' }}>
           {studyInvites.map(inv => (
@@ -166,7 +134,6 @@ export default function Friends({ session, setActivePage }) {
         </div>
       )}
 
-      {/* Search */}
       <div style={{ ...card, marginBottom: '24px' }}>
         <p style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-sans)', marginBottom: '10px' }}>Add a friend</p>
         <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
@@ -186,7 +153,6 @@ export default function Friends({ session, setActivePage }) {
         )}
       </div>
 
-      {/* Incoming requests */}
       {incoming.length > 0 && (
         <div style={{ marginBottom: '24px' }}>
           <p style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-sans)', marginBottom: '12px' }}>Friend requests ({incoming.length})</p>
@@ -204,7 +170,6 @@ export default function Friends({ session, setActivePage }) {
         </div>
       )}
 
-      {/* Friends list */}
       <div>
         <p style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-sans)', marginBottom: '12px' }}>
           Friends {friends.length > 0 ? `(${friends.length})` : ''}
