@@ -31,7 +31,7 @@ export default function Friends({ session, setActivePage }) {
 
     const otherIds = fs.map(f => f.requester_id === uid ? f.addressee_id : f.requester_id)
     const { data: friendProfiles } = await supabase.from('profiles')
-      .select('id, name, username, avatar_animal')
+      .select('id, name, username')
       .in('id', otherIds)
 
     const profileMap = {}
@@ -53,7 +53,7 @@ export default function Friends({ session, setActivePage }) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, name, username, avatar_animal')
+        .select('id, name, username')
         .ilike('username', search.trim())
         .limit(1)
       
