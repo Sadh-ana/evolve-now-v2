@@ -50,13 +50,38 @@ export default function Friends({ session, setActivePage }) {
   async function searchUser() {
     if (!search.trim()) return
     setSearching(true); setSearchError(''); setSearchResult(null)
-    const { data } = await supabase.from('profiles')
-      .select('id, name, username, avatar_animal')
-      .eq('username', search.trim().toLowerCase())
-      .maybeSingle()
-    if (!data) { setSearchError('No user found with that username'); setSearching(false); return }
-    if (data.id === session.user.id) { setSearchError('That\'s you!'); setSearching(false); return }
-    setSearchResult(data); setSearching(false)
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, name, username, avatar_animal')
+        .ilike('username', search.trim())
+        .limit(1)
+      
+      if (error) {
+        console.error('Search error:', error)
+        setSearchError('Search failed: ' + error.message)
+        setSearching(false)
+        return
+      }
+      
+      if (!data || data.length === 0) {
+        setSearchError('No user found with that username')
+        setSearching(false)
+        return
+      }
+      
+      const user = data[0]
+      if (user.id === session.user.id) {
+        setSearchError('That\'s you!')
+        setSearching(false)
+        return
+      }
+      
+      setSearchResult(user)
+    } catch (e) {
+      setSearchError('Error: ' + e.message)
+    }
+    setSearching(false)
   }
 
   async function sendRequest(toId) {

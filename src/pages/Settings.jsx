@@ -57,9 +57,13 @@ export default function Settings({ session }) {
 
   async function save() {
     setSaving(true)
-    await supabase.from('profiles').update({
+    const { error } = await supabase.from('profiles').update({
       name, username, archetype, health_flags: healthFlags, board, peak_time: peakTime,
     }).eq('id', session.user.id)
+    if (error) {
+      console.error('Save error:', error)
+      alert('Save failed: ' + error.message)
+    }
     setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2500)
   }
 
