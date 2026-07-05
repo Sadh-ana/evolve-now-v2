@@ -12,7 +12,11 @@ export default function Friends({ session, setActivePage }) {
   const [myUsername, setMyUsername] = useState('')
   const [studyInvites, setStudyInvites] = useState([])
 
-  useEffect(() => { fetchAll() }, [])
+  useEffect(() => {
+    fetchAll()
+    const iv = setInterval(() => fetchAll(), 8000)
+    return () => clearInterval(iv)
+  }, [])
 
   async function fetchAll() {
     const uid = session.user.id
