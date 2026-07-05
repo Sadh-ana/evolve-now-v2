@@ -129,12 +129,14 @@ function App() {
     )
   }
   if (!onboarded) return (
-    <AppErrorBoundary>
-      <Suspense fallback={<LoadingState />}>
-        <Onboarding session={session} onComplete={() => { setOnboarded(true); fetchProfile(session.user.id) }} />
-      </Suspense>
-    </AppErrorBoundary>
-  )
+  <Onboarding
+    session={session}
+    onComplete={() => {
+      setOnboarded(true)
+      fetchProfile(session.user.id)
+    }}
+  />
+)
 
   const fullHeight = ['brainstorm', 'hobbies'].includes(activePage)
 
