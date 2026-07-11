@@ -74,6 +74,7 @@ export default function Sidebar({ activePage, setActivePage, userName, darkMode,
           <button
             key={item.id}
             onClick={() => setActivePage(item.id)}
+            data-tour={`sidebar-${item.id}`}
             style={{
               width: '100%',
               display: 'flex',
