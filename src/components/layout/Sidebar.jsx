@@ -6,7 +6,7 @@ const navItems = [
   { id: 'calendar', label: 'Calendar', icon: '◻' },
   { id: 'habits', label: 'Habits', icon: '◎' },
   { id: 'focus', label: 'Focus', icon: '◷' },
-  { id: 'study_room', label: 'Study Room', icon: '◉' },
+  { id: 'studyroom', label: 'Study Room', icon: '◉' },
   { id: 'friends', label: 'Friends', icon: '♡' },
   { id: 'journal', label: 'Journal', icon: '✦' },
   { id: 'brainstorm', label: 'Brainstorm', icon: '∞' },
