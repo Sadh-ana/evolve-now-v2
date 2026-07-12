@@ -47,6 +47,7 @@ function App() {
   const [moodMode, setMoodMode] = useState('normal')
   const [showTour, setShowTour] = useState(false)
   const [fullHeight, setFullHeight] = useState(false)
+  const [darkMode, setDarkMode] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -65,6 +66,29 @@ function App() {
   useEffect(() => {
     setFullHeight(activePage === 'studyroom')
   }, [activePage])
+
+  useEffect(() => {
+    const root = document.documentElement
+    if (darkMode) {
+      root.style.setProperty('--base-950', '#ffffff')
+      root.style.setProperty('--base-900', '#f5f0eb')
+      root.style.setProperty('--base-800', '#ede5dc')
+      root.style.setProperty('--base-700', '#e0d4c8')
+      root.style.setProperty('--base-600', '#c8b8a8')
+      root.style.setProperty('--cream-200', '#2a1f14')
+      root.style.setProperty('--muted', '#6b5040')
+      root.style.setProperty('--gold-300', '#8a5a2a')
+    } else {
+      root.style.setProperty('--base-950', '#1a120b')
+      root.style.setProperty('--base-900', '#1e1510')
+      root.style.setProperty('--base-800', '#231a12')
+      root.style.setProperty('--base-700', '#2a1f14')
+      root.style.setProperty('--base-600', '#3d2a1a')
+      root.style.setProperty('--cream-200', '#e8d5c0')
+      root.style.setProperty('--muted', '#8a7060')
+      root.style.setProperty('--gold-300', '#c9a87c')
+    }
+  }, [darkMode])
 
   async function fetchProfile(uid) {
     const { data } = await supabase.from('profiles').select('name, onboarded').eq('id', uid).single()
@@ -146,8 +170,8 @@ function App() {
           activePage={activePage}
           setActivePage={setActivePage}
           userName={userName}
-          darkMode={moodMode === 'focus'}
-          setDarkMode={() => {}}
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
         />
         <main style={{
           marginLeft: '220px',
