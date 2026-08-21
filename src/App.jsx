@@ -57,11 +57,11 @@ function App() {
   useEffect(() => {
     const root = document.documentElement
     if (darkMode) {
-      root.style.setProperty('--base-950', '#f5f0eb')
-      root.style.setProperty('--base-900', '#ede5dc')
-      root.style.setProperty('--base-800', '#e0d4c8')
-      root.style.setProperty('--base-700', '#d0c0b0')
-      root.style.setProperty('--base-600', '#b8a898')
+      root.style.setProperty('--base-950', '#ffffff')
+      root.style.setProperty('--base-900', '#f5f0eb')
+      root.style.setProperty('--base-800', '#ede5dc')
+      root.style.setProperty('--base-700', '#e0d4c8')
+      root.style.setProperty('--base-600', '#c8b8a8')
       root.style.setProperty('--cream-200', '#2a1f14')
       root.style.setProperty('--muted', '#6b5040')
       root.style.setProperty('--gold-300', '#8a5a2a')
@@ -128,35 +128,31 @@ function App() {
     </div>
   )
 
-  // Pages rendered with display:none when not active — preserves state when switching tabs
-  const allPages = [
-    { id: 'dashboard', el: <Dashboard session={session} moodMode={moodMode} /> },
-    { id: 'tasks', el: <Tasks session={session} /> },
-    { id: 'calendar', el: <Calendar session={session} /> },
-    { id: 'habits', el: <Habits session={session} /> },
-    { id: 'focus', el: <Focus session={session} /> },
-    { id: 'journal', el: <Journal session={session} /> },
-    { id: 'stats', el: <Stats session={session} /> },
-    { id: 'brainstorm', el: <Brainstorm session={session} /> },
-    { id: 'physical', el: <Physical session={session} /> },
-    { id: 'hobbies', el: <Hobbies session={session} /> },
-    { id: 'vision', el: <Vision session={session} /> },
-    { id: 'health', el: <Health session={session} /> },
-    { id: 'settings', el: <Settings session={session} /> },
-    { id: 'studyroom', el: <StudyRoom session={session} /> },
-    { id: 'lifecoach', el: <LifeCoach session={session} /> },
-    { id: 'challenges', el: <DailyChallenges session={session} /> },
-    { id: 'badges', el: <Badges session={session} /> },
-    { id: 'friends', el: <Friends session={session} setActivePage={setActivePage} /> },
-  ]
-
-  const isStudyRoom = activePage === 'studyroom'
+  const pages = {
+    dashboard: <Dashboard session={session} moodMode={moodMode} />,
+    tasks: <Tasks session={session} />,
+    calendar: <Calendar session={session} />,
+    habits: <Habits session={session} />,
+    focus: <Focus session={session} />,
+    journal: <Journal session={session} />,
+    stats: <Stats session={session} />,
+    brainstorm: <Brainstorm session={session} />,
+    physical: <Physical session={session} />,
+    hobbies: <Hobbies session={session} />,
+    vision: <Vision session={session} />,
+    health: <Health session={session} />,
+    settings: <Settings session={session} />,
+    studyroom: <StudyRoom session={session} />,
+    lifecoach: <LifeCoach session={session} />,
+    challenges: <DailyChallenges session={session} />,
+    badges: <Badges session={session} />,
+    friends: <Friends session={session} setActivePage={setActivePage} />,
+  }
 
   return (
     <AppErrorBoundary>
-      <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'var(--base-950)' }}>
+      <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--base-950)' }}>
         <AmbientLayer />
-
         <Sidebar
           activePage={activePage}
           setActivePage={setActivePage}
@@ -164,53 +160,32 @@ function App() {
           darkMode={darkMode}
           setDarkMode={setDarkMode}
         />
-
-        {/* Main content area */}
-        <div style={{
-          marginLeft: '220px',
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100vh',
-          overflow: 'hidden',
-          position: 'relative',
-          zIndex: 1,
-        }}>
-          {/* Mood mode picker */}
-          <div data-tour="mood-mode" style={{ position: 'fixed', top: '16px', right: '20px', zIndex: 200 }}>
+        <main
+          key={activePage}
+          style={{
+            marginLeft: '220px',
+            flex: 1,
+            overflowY: 'auto',
+            minHeight: '100vh',
+            position: 'relative',
+            zIndex: 1,
+            animation: 'pageFade 0.2s ease',
+          }}
+        >
+          <div
+            data-tour="mood-mode"
+            style={{ position: 'fixed', top: '16px', right: '20px', zIndex: 200 }}
+          >
             <MoodMode current={moodMode} onChange={id => {
               setMoodMode(id)
               const mode = MOOD_MODES.find(m => m.id === id)
               if (mode) applyMoodMode(mode)
             }} />
           </div>
-
-          {/* All pages — hidden when not active, preserving state */}
           <Suspense fallback={<LoadingState />}>
-            {allPages.map(({ id, el }) => (
-              <div
-                key={id}
-                style={{
-                  display: activePage === id ? 'flex' : 'none',
-                  flexDirection: 'column',
-                  flex: activePage === id ? 1 : undefined,
-                  overflowY: id === 'studyroom' ? 'hidden' : 'auto',
-                  height: '100%',
-                }}
-              >
-                {el}
-              </div>
-            ))}
-
-            {/* Fallback for unknown pages */}
-            {!allPages.find(p => p.id === activePage) && (
-              <div style={{ flex: 1, overflowY: 'auto' }}>
-                <ComingSoon page={activePage} />
-              </div>
-            )}
+            {pages[activePage] || <ComingSoon page={activePage} />}
           </Suspense>
-        </div>
-
+        </main>
         {showTour && <SpotlightTour onFinish={() => setShowTour(false)} />}
       </div>
     </AppErrorBoundary>
