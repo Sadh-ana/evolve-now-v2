@@ -33,6 +33,18 @@ function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activePage, setActivePage] = useState('dashboard')
+  const [prevPage, setPrevPage] = useState('dashboard')
+
+  const PAGE_ORDER = [
+    'dashboard', 'tasks', 'calendar', 'habits', 'focus', 'journal', 
+    'brainstorm', 'physical', 'hobbies', 'vision', 'health', 
+    'studyroom', 'lifecoach', 'stats', 'friends', 'settings'
+  ]
+
+  const handlePageChange = (newPage) => {
+    setPrevPage(activePage)
+    setActivePage(newPage)
+  }
   const [userName, setUserName] = useState('')
   const [onboarded, setOnboarded] = useState(true)
   const [showAuth, setShowAuth] = useState(false)
@@ -155,7 +167,7 @@ function App() {
         <AmbientLayer />
         <Sidebar
           activePage={activePage}
-          setActivePage={setActivePage}
+          setActivePage={handlePageChange}
           userName={userName}
           darkMode={darkMode}
           setDarkMode={setDarkMode}
@@ -165,11 +177,13 @@ function App() {
           style={{
             marginLeft: '220px',
             flex: 1,
+            height: '100vh',
             overflowY: 'auto',
-            minHeight: '100vh',
             position: 'relative',
             zIndex: 1,
-            animation: 'pageFade 0.2s ease',
+            animation: PAGE_ORDER.indexOf(activePage) > PAGE_ORDER.indexOf(prevPage) 
+              ? 'slideLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1)' 
+              : 'slideRight 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         >
           <div
@@ -183,7 +197,11 @@ function App() {
             }} />
           </div>
           <Suspense fallback={<LoadingState />}>
-            {pages[activePage] || <ComingSoon page={activePage} />}
+            {/* Always render StudyRoom but hide with CSS to persist state */}
+            <div style={{ display: activePage === 'studyroom' ? 'block' : 'none' }}>
+              <StudyRoom session={session} />
+            </div>
+            {activePage !== 'studyroom' && (pages[activePage] || <ComingSoon page={activePage} />)}
           </Suspense>
         </main>
         {showTour && <SpotlightTour onFinish={() => setShowTour(false)} />}

@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
+import { playSound } from '../lib/audio'
 import { format, subDays, eachDayOfInterval } from 'date-fns'
 
 const CATEGORIES = [
@@ -74,7 +75,15 @@ export default function Habits({ session }) {
     if (data) setHabits(p => [...p, data])
   }
 
-  async function toggleHabit(habitId) {
+  const [confetti, setConfetti] = useState([])
+
+  const triggerConfetti = useCallback((x, y) => {
+    const id = Date.now()
+    setConfetti(p => [...p, { id, x, y }])
+    setTimeout(() => setConfetti(p => p.filter(c => c.id !== id)), 2000)
+  }, [])
+
+  async function toggleHabit(habitId, e) {
     const uid = session.user.id
     const existing = logs.find(l => l.habit_id === habitId && l.completed_on === today)
     if (existing) {
@@ -82,7 +91,11 @@ export default function Habits({ session }) {
       setLogs(p => p.filter(l => l.id !== existing.id))
     } else {
       const { data } = await supabase.from('habit_logs').insert({ habit_id: habitId, user_id: uid, completed_on: today }).select().single()
-      if (data) setLogs(p => [...p, data])
+      if (data) {
+        setLogs(p => [...p, data])
+        playSound('complete')
+        if (e) triggerConfetti(e.clientX, e.clientY)
+      }
     }
   }
 
@@ -173,7 +186,7 @@ export default function Habits({ session }) {
             return (
               <div key={habit.id} style={{ background: 'var(--base-800)', border: `0.5px solid ${done ? cat.color + '60' : 'var(--base-600)'}`, borderRadius: 'var(--radius-lg)', padding: '18px 20px', transition: 'all 0.25s' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '12px' }}>
-                  <button onClick={() => toggleHabit(habit.id)} style={{ width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0, border: `2px solid ${done ? cat.color : 'var(--base-500)'}`, background: done ? cat.color : 'transparent', cursor: 'pointer', fontSize: '12px', color: 'var(--base-950)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
+                  <button onClick={(e) => toggleHabit(habit.id, e)} style={{ width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0, border: `2px solid ${done ? cat.color : 'var(--base-500)'}`, background: done ? cat.color : 'transparent', cursor: 'pointer', fontSize: '12px', color: 'var(--base-950)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
                     {done && '✓'}
                   </button>
                   <div style={{ flex: 1 }}>
@@ -203,6 +216,30 @@ export default function Habits({ session }) {
           })}
         </div>
       )}
+
+      {confetti.map(c => (
+        <div key={c.id} style={{ position: 'fixed', left: c.x, top: c.y, pointerEvents: 'none', zIndex: 9999 }}>
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} style={{
+              position: 'absolute',
+              width: '6px', height: '6px',
+              background: ['#c9a87c', '#d4a5a5', '#9eb5d4', '#a8c4a0'][i % 4],
+              borderRadius: '50%',
+              animation: `confettiFly${i} 1.5s ease-out forwards`
+            }} />
+          ))}
+          <style>{Array.from({ length: 12 }).map((_, i) => {
+            const angle = (i / 12) * Math.PI * 2
+            const dist = 60 + Math.random() * 40
+            const tx = Math.cos(angle) * dist
+            const ty = Math.sin(angle) * dist
+            return `@keyframes confettiFly${i} { 
+              0% { transform: translate(0,0) scale(1); opacity: 1; }
+              100% { transform: translate(${tx}px, ${ty}px) scale(0); opacity: 0; }
+            }`
+          }).join('\n')}</style>
+        </div>
+      ))}
 
       {showAdd && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }} onClick={() => setShowAdd(false)}>

@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { Modal } from '../components/ui'
+import { PrivacyPolicy, TermsOfService } from './Legal'
+import { trackEvent } from '../lib/analytics'
 
 const WORDS = ['focus', 'grow', 'evolve', 'build', 'rest', 'create', 'win']
 
@@ -248,6 +251,8 @@ export default function Landing({ onEnter }) {
   const [scrolled, setScrolled] = useState(false)
   const [hoveredFeature, setHoveredFeature] = useState(null)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+  const [showPrivacy, setShowPrivacy] = useState(false)
+  const [showTerms, setShowTerms] = useState(false)
 
   useEffect(() => {
     const iv = setInterval(() => {
@@ -292,7 +297,7 @@ export default function Landing({ onEnter }) {
             onMouseEnter={e => e.target.style.color = '#c9a87c'}
             onMouseLeave={e => e.target.style.color = '#8a7060'}
           >Sign in</button>
-          <MagneticButton onClick={onEnter} primary style={{ padding: '9px 22px', fontSize: '13px' }}>Get started ✦</MagneticButton>
+          <MagneticButton onClick={() => { trackEvent('landing_nav_get_started'); onEnter(); }} primary style={{ padding: '9px 22px', fontSize: '13px' }}>Get started ✦</MagneticButton>
         </div>
       </nav>
 
@@ -312,18 +317,11 @@ export default function Landing({ onEnter }) {
             fontSize: 'clamp(48px, 7.5vw, 108px)',
             fontWeight: 400, fontStyle: 'italic',
             color: '#f0e6d8', lineHeight: 1.0,
-            marginBottom: '8px',
+            marginBottom: '32px',
             textShadow: '0 0 80px rgba(201,168,124,0.1)',
           }}>
-            built to help you
-          </h1>
-
-          {/* Morphing word */}
-          <div style={{ height: 'clamp(52px, 8vw, 108px)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '32px' }}>
+            built to help you{' '}
             <span style={{
-              fontFamily: 'Georgia, serif',
-              fontSize: 'clamp(48px, 7.5vw, 108px)',
-              fontWeight: 400, fontStyle: 'italic',
               background: 'linear-gradient(135deg, #c9a87c, #d4a5a5, #9eb5d4)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -335,7 +333,7 @@ export default function Landing({ onEnter }) {
               lineHeight: 1.0,
               filter: wordVisible ? 'blur(0px)' : 'blur(4px)',
             }}>{WORDS[wordIdx]}</span>
-          </div>
+          </h1>
         </div>
 
         <div style={{ ...parallax(6) }}>
@@ -344,7 +342,7 @@ export default function Landing({ onEnter }) {
           </p>
 
           <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <MagneticButton onClick={onEnter} primary>Start for free ✦</MagneticButton>
+            <MagneticButton onClick={() => { trackEvent('landing_hero_start_free'); onEnter(); }} primary>Start for free ✦</MagneticButton>
             <MagneticButton onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}>See how it works</MagneticButton>
           </div>
         </div>
@@ -400,7 +398,6 @@ export default function Landing({ onEnter }) {
                   borderRadius: '18px', padding: '32px',
                   transition: 'all 0.35s cubic-bezier(0.34, 1.2, 0.64, 1)',
                   transform: hoveredFeature === i ? 'translateY(-6px) scale(1.01)' : 'translateY(0) scale(1)',
-                  cursor: 'default',
                   position: 'relative', overflow: 'hidden',
                 }}>
 
@@ -430,7 +427,8 @@ export default function Landing({ onEnter }) {
           <ScrollReveal>
             <p style={{ fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(138,112,96,0.5)', marginBottom: '28px' }}>adaptive by design</p>
             <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(26px, 4vw, 52px)', fontStyle: 'italic', fontWeight: 400, color: '#f0e6d8', lineHeight: 1.35, marginBottom: '28px' }}>
-              "EVOLVE notices when you're burning out<br />before you do."
+              "EVOLVE notices when you're burning out  
+before you do."
             </h2>
             <p style={{ fontSize: '15px', color: 'rgba(138,112,96,0.75)', lineHeight: 1.95, fontWeight: 300, marginBottom: '60px', maxWidth: '600px', margin: '0 auto 60px' }}>
               Flag a sick day, a low-focus day, a period day — and EVOLVE protects your streaks without judgment. Your archetype shapes everything. No two setups look the same.
@@ -473,7 +471,7 @@ export default function Landing({ onEnter }) {
             ready to evolve?
           </h2>
           <p style={{ fontSize: '15px', color: 'rgba(138,112,96,0.7)', marginBottom: '52px', fontWeight: 300 }}>3 minutes to set up. Adapts to you forever.</p>
-          <MagneticButton onClick={onEnter} primary style={{ padding: '18px 56px', fontSize: '15px', boxShadow: '0 0 80px rgba(201,168,124,0.25), 0 0 160px rgba(201,168,124,0.1)' }}>
+          <MagneticButton onClick={() => { trackEvent('landing_cta_bottom'); onEnter(); }} primary style={{ padding: '18px 56px', fontSize: '15px', boxShadow: '0 0 80px rgba(201,168,124,0.25), 0 0 160px rgba(201,168,124,0.1)' }}>
             Begin your journey ✦
           </MagneticButton>
         </ScrollReveal>
@@ -487,10 +485,17 @@ export default function Landing({ onEnter }) {
         </div>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <span style={{ fontSize: '10px', color: 'rgba(138,112,96,0.4)', letterSpacing: '0.08em' }}>your growth, organised ✦</span>
-          <a href="#privacy" onClick={(e) => { e.preventDefault(); window.location.hash = 'privacy' }} style={{ color: 'rgba(138,112,96,0.5)', fontSize: '12px', marginLeft: '12px', textDecoration: 'none' }}>Privacy</a>
-          <a href="#terms" onClick={(e) => { e.preventDefault(); window.location.hash = 'terms' }} style={{ color: 'rgba(138,112,96,0.5)', fontSize: '12px', marginLeft: '8px', textDecoration: 'none' }}>Terms</a>
+          <button onClick={() => setShowPrivacy(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(138,112,96,0.5)', fontSize: '12px', marginLeft: '12px' }}>Privacy</button>
+          <button onClick={() => setShowTerms(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(138,112,96,0.5)', fontSize: '12px', marginLeft: '8px' }}>Terms</button>
         </div>
       </div>
+
+      <Modal open={showPrivacy} onClose={() => setShowPrivacy(false)} title="Privacy Policy" maxWidth="700px">
+        <PrivacyPolicy />
+      </Modal>
+      <Modal open={showTerms} onClose={() => setShowTerms(false)} title="Terms of Service" maxWidth="700px">
+        <TermsOfService />
+      </Modal>
 
       <style>{`
         @keyframes orbPulse {
