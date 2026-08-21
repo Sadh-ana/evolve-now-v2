@@ -7,6 +7,7 @@ import AppErrorBoundary from './components/AppErrorBoundary'
 import SpotlightTour from './components/SpotlightTour'
 import { LoadingState } from './components/ui'
 
+// Lazy components
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Tasks = lazy(() => import('./pages/Tasks'))
 const Calendar = lazy(() => import('./pages/Calendar'))
@@ -29,28 +30,37 @@ const Landing = lazy(() => import('./pages/Landing'))
 const Auth = lazy(() => import('./pages/Auth'))
 const Onboarding = lazy(() => import('./pages/Onboarding'))
 
+const PAGE_ORDER = [
+  'dashboard', 'tasks', 'calendar', 'habits', 'focus', 'journal', 
+  'brainstorm', 'physical', 'hobbies', 'vision', 'health', 
+  'studyroom', 'lifecoach', 'stats', 'friends', 'settings'
+]
+
+const ComingSoon = ({ page }) => (
+  <div style={{ padding: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
+    <div style={{ textAlign: 'center' }}>
+      <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontStyle: 'italic', color: 'var(--cream-200)', marginBottom: '8px' }}>{page}</h2>
+      <p style={{ color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontSize: '13px' }}>coming soon ✦</p>
+    </div>
+  </div>
+)
+
 function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activePage, setActivePage] = useState('dashboard')
   const [prevPage, setPrevPage] = useState('dashboard')
-
-  const PAGE_ORDER = [
-    'dashboard', 'tasks', 'calendar', 'habits', 'focus', 'journal', 
-    'brainstorm', 'physical', 'hobbies', 'vision', 'health', 
-    'studyroom', 'lifecoach', 'stats', 'friends', 'settings'
-  ]
-
-  const handlePageChange = (newPage) => {
-    setPrevPage(activePage)
-    setActivePage(newPage)
-  }
   const [userName, setUserName] = useState('')
   const [onboarded, setOnboarded] = useState(true)
   const [showAuth, setShowAuth] = useState(false)
   const [moodMode, setMoodMode] = useState('normal')
   const [showTour, setShowTour] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
+
+  const handlePageChange = (newPage) => {
+    setPrevPage(activePage)
+    setActivePage(newPage)
+  }
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -69,34 +79,16 @@ function App() {
   useEffect(() => {
     const root = document.documentElement
     if (darkMode) {
-      root.style.setProperty('--base-950', '#ffffff')
-      root.style.setProperty('--base-900', '#f5f0eb')
-      root.style.setProperty('--base-800', '#ede5dc')
-      root.style.setProperty('--base-700', '#e0d4c8')
-      root.style.setProperty('--base-600', '#c8b8a8')
-      root.style.setProperty('--cream-200', '#2a1f14')
-      root.style.setProperty('--muted', '#6b5040')
-      root.style.setProperty('--gold-300', '#8a5a2a')
+      root.style.setProperty('--base-950', '#ffffff'); root.style.setProperty('--base-900', '#f5f0eb'); root.style.setProperty('--base-800', '#ede5dc'); root.style.setProperty('--base-700', '#e0d4c8'); root.style.setProperty('--base-600', '#c8b8a8'); root.style.setProperty('--cream-200', '#2a1f14'); root.style.setProperty('--muted', '#6b5040'); root.style.setProperty('--gold-300', '#8a5a2a');
     } else {
-      root.style.setProperty('--base-950', '#1a120b')
-      root.style.setProperty('--base-900', '#1e1510')
-      root.style.setProperty('--base-800', '#231a12')
-      root.style.setProperty('--base-700', '#2a1f14')
-      root.style.setProperty('--base-600', '#3d2a1a')
-      root.style.setProperty('--cream-200', '#e8d5c0')
-      root.style.setProperty('--muted', '#8a7060')
-      root.style.setProperty('--gold-300', '#c9a87c')
+      root.style.setProperty('--base-950', '#1a120b'); root.style.setProperty('--base-900', '#1e1510'); root.style.setProperty('--base-800', '#231a12'); root.style.setProperty('--base-700', '#2a1f14'); root.style.setProperty('--base-600', '#3d2a1a'); root.style.setProperty('--cream-200', '#e8d5c0'); root.style.setProperty('--muted', '#8a7060'); root.style.setProperty('--gold-300', '#c9a87c');
     }
   }, [darkMode])
 
   async function fetchProfile(uid) {
     const { data } = await supabase.from('profiles').select('name, onboarded').eq('id', uid).single()
-    if (data) {
-      setUserName(data.name || '')
-      setOnboarded(!!data.onboarded)
-    } else {
-      setOnboarded(false)
-    }
+    if (data) { setUserName(data.name || ''); setOnboarded(!!data.onboarded); } 
+    else { setOnboarded(false); }
   }
 
   if (loading) return (
@@ -106,39 +98,11 @@ function App() {
   )
 
   if (!session) {
-    if (showAuth) return (
-      <Suspense fallback={<LoadingState />}>
-        <Auth onBack={() => setShowAuth(false)} />
-      </Suspense>
-    )
-    return (
-      <Suspense fallback={<LoadingState />}>
-        <Landing onEnter={() => setShowAuth(true)} />
-      </Suspense>
-    )
+    if (showAuth) return <Suspense fallback={<LoadingState />}><Auth onBack={() => setShowAuth(false)} /></Suspense>
+    return <Suspense fallback={<LoadingState />}><Landing onEnter={() => setShowAuth(true)} /></Suspense>
   }
 
-  if (!onboarded) return (
-    <Suspense fallback={<LoadingState />}>
-      <Onboarding
-        session={session}
-        onComplete={() => {
-          setOnboarded(true)
-          setShowTour(true)
-          fetchProfile(session.user.id)
-        }}
-      />
-    </Suspense>
-  )
-
-  const ComingSoon = ({ page }) => (
-    <div style={{ padding: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
-      <div style={{ textAlign: 'center' }}>
-        <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontStyle: 'italic', color: 'var(--cream-200)', marginBottom: '8px' }}>{page}</h2>
-        <p style={{ color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontSize: '13px' }}>coming soon ✦</p>
-      </div>
-    </div>
-  )
+  if (!onboarded) return <Suspense fallback={<LoadingState />}><Onboarding session={session} onComplete={() => { setOnboarded(true); setShowTour(true); fetchProfile(session.user.id); }} /></Suspense>
 
   const pages = {
     dashboard: <Dashboard session={session} moodMode={moodMode} />,
@@ -158,46 +122,27 @@ function App() {
     lifecoach: <LifeCoach session={session} />,
     challenges: <DailyChallenges session={session} />,
     badges: <Badges session={session} />,
-    friends: <Friends session={session} setActivePage={setActivePage} />,
+    friends: <Friends session={session} setActivePage={handlePageChange} />,
   }
 
   return (
     <AppErrorBoundary>
       <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--base-950)' }}>
         <AmbientLayer />
-        <Sidebar
-          activePage={activePage}
-          setActivePage={handlePageChange}
-          userName={userName}
-          darkMode={darkMode}
-          setDarkMode={setDarkMode}
-        />
+        <Sidebar activePage={activePage} setActivePage={handlePageChange} userName={userName} darkMode={darkMode} setDarkMode={setDarkMode} />
         <main
           key={activePage}
           style={{
-            marginLeft: '220px',
-            flex: 1,
-            height: '100vh',
-            overflowY: 'auto',
-            position: 'relative',
-            zIndex: 1,
+            marginLeft: '220px', flex: 1, height: '100vh', overflowY: 'auto', position: 'relative', zIndex: 1,
             animation: PAGE_ORDER.indexOf(activePage) > PAGE_ORDER.indexOf(prevPage) 
               ? 'slideLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1)' 
               : 'slideRight 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         >
-          <div
-            data-tour="mood-mode"
-            style={{ position: 'fixed', top: '16px', right: '20px', zIndex: 200 }}
-          >
-            <MoodMode current={moodMode} onChange={id => {
-              setMoodMode(id)
-              const mode = MOOD_MODES.find(m => m.id === id)
-              if (mode) applyMoodMode(mode)
-            }} />
+          <div data-tour="mood-mode" style={{ position: 'fixed', top: '16px', right: '20px', zIndex: 200 }}>
+            <MoodMode current={moodMode} onChange={id => { setMoodMode(id); const mode = MOOD_MODES.find(m => m.id === id); if (mode) applyMoodMode(mode); }} />
           </div>
           <Suspense fallback={<LoadingState />}>
-            {/* Always render StudyRoom but hide with CSS to persist state */}
             <div style={{ display: activePage === 'studyroom' ? 'block' : 'none' }}>
               <StudyRoom session={session} />
             </div>
