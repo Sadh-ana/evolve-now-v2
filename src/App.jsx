@@ -42,7 +42,7 @@ function App() {
   const [darkMode,   setDarkMode]   = useState(false)
 
   // Nav order for directional transitions
-  const navOrder = ['dashboard','tasks','calendar','habits','focus','studyroom','friends','journal','brainstorm','hobbies','health','physical','vision','lifecoach','challenges','badges','stats','settings']
+  const navOrder = ['dashboard','tasks','calendar','habits','focus','studyroom','friends','journal','brainstorm','hobbies','health','physical','vision','life_coach','challenges','badges','stats','settings']
   const direction = navOrder.indexOf(activePage) >= navOrder.indexOf(prevPage) ? 'forward' : 'back'
 
   function navigate(page) {
@@ -156,7 +156,7 @@ function App() {
     vision:     <Vision     session={session} />,
     health:     <Health     session={session} />,
     settings:   <Settings   session={session} />,
-    lifecoach:  <LifeCoach  session={session} />,
+    life_coach: <LifeCoach  session={session} />,
     challenges: <DailyChallenges session={session} />,
     badges:     <Badges     session={session} />,
     friends:    <Friends    session={session} setActivePage={navigate} />,
