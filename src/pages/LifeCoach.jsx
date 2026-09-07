@@ -49,13 +49,26 @@ export default function LifeCoach({ session }) {
     console.log('LifeCoach init', { uid, sessionUserId: session?.user?.id })
     const start7 = format(subDays(new Date(), 7), 'yyyy-MM-dd')
 
-    const [{ data: prof }, { data: tasks }, { data: habits }, { data: focusSessions }, { data: checkins }, { data: msgs }] = await Promise.all([
+    const [
+      { data: prof },
+      { data: tasks },
+      { data: habits },
+      { data: focusSessions },
+      { data: checkins },
+      { data: msgs },
+      { data: healthLogs },
+      { data: goals },
+      { data: insights },
+    ] = await Promise.all([
       supabase.from('profiles').select('name, archetype, health_flags, peak_time, work_style, board').eq('id', uid).single(),
       supabase.from('tasks').select('title, status, priority').eq('user_id', uid).gte('created_at', new Date(Date.now() - 7 * 86400000).toISOString()).limit(20),
-      supabase.from('habits').select('name, category').eq('user_id', uid),
+      supabase.from('habits').select('id, name, category').eq('user_id', uid),
       supabase.from('focus_sessions').select('duration_minutes, emotion, subject, date').eq('user_id', uid).gte('date', start7),
       supabase.from('checkins').select('mood, energy, date').eq('user_id', uid).order('date', { ascending: false }).limit(7),
       supabase.from('life_coach_messages').select('*').eq('user_id', uid).order('created_at').limit(60),
+      supabase.from('health_logs').select('sleep_hours, sleep_quality, steps, date').eq('user_id', uid).gte('date', start7),
+      supabase.from('goals').select('title, horizon, category, status').eq('user_id', uid).eq('status', 'active'),
+      supabase.from('pattern_insights').select('insight_text').eq('user_id', uid).order('computed_at', { ascending: false }).limit(3),
     ])
 
     setProfile(prof)
@@ -63,6 +76,9 @@ export default function LifeCoach({ session }) {
     const totalFocus = (focusSessions || []).reduce((s, f) => s + (f.duration_minutes || 0), 0)
     const avgMood = (checkins || []).length
       ? ((checkins || []).reduce((s, c) => s + c.mood, 0) / checkins.length).toFixed(1)
+      : 'unknown'
+    const avgSleep = (healthLogs || []).length
+      ? ((healthLogs || []).reduce((s, h) => s + (h.sleep_hours || 0), 0) / healthLogs.length).toFixed(1)
       : 'unknown'
     const doneTasks = (tasks || []).filter(t => t.status === 'done').length
     const emotions = [...new Set((focusSessions || []).map(f => f.emotion).filter(Boolean))]
@@ -78,8 +94,11 @@ Last 7 days data:
 - Focus sessions: ${Math.round(totalFocus / 60 * 10) / 10}h total
 - Tasks completed: ${doneTasks}
 - Average mood: ${avgMood}/5
+- Average sleep: ${avgSleep}h/night
 - Session emotions logged: ${emotions.join(', ') || 'not tracked'}
 - Active habits: ${(habits || []).map(h => h.name).join(', ') || 'none'}
+- Active goals: ${(goals || []).map(g => `${g.title} (${g.horizon})`).join(', ') || 'none set'}
+- Known patterns: ${(insights || []).map(i => i.insight_text).join(' | ') || 'not enough data yet'}
 
 Today: ${format(new Date(), 'EEEE, MMMM d yyyy')}`
 
@@ -108,7 +127,7 @@ ${ctx}
 
 Your approach:
 - Be honest, sometimes uncomfortably so — but always kind and specific to THIS person
-- Notice patterns they haven't seen: cross-reference their mood, focus, and habit data
+- Notice patterns they haven't seen: cross-reference their mood, focus, sleep, and habit data
 - Ground every insight in evidence: ultradian rhythms, habit loops, SDT, spaced repetition, cognitive load
 - Never give generic motivational fluff — if it could apply to anyone, rewrite it
 - Ask one powerful question per response, not a list
