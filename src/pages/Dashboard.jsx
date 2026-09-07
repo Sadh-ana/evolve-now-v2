@@ -3,6 +3,9 @@ import { supabase } from '../lib/supabase'
 import { format, subDays } from 'date-fns'
 import ChallengesCompact from '../components/ChallengesCompact'
 import BadgesCompact from '../components/BadgesCompact'
+import { computeAndStorePatterns, getRecentInsights } from '../lib/patternEngine'
+import { getAdaptivePlan } from '../lib/adaptivePlanner'
+import { getMorningBrief } from '../lib/morningBrief'
 
 const quotes = [
   "You don't rise to the level of your goals, you fall to the level of your systems.",
@@ -43,6 +46,10 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
   const [burnoutAlert, setBurnoutAlert] = useState(false)
   const [weeklyReport, setWeeklyReport] = useState(null)
   const [generatingReport, setGeneratingReport] = useState(false)
+
+  // --- intelligence layer state ---
+  const [insights, setInsights] = useState([])
+  const [morningBrief, setMorningBrief] = useState(null)
 
   const quote = quotes[new Date().getDay() % quotes.length]
   const today = format(new Date(), 'EEEE, MMMM d')
@@ -89,6 +96,39 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
     if (recentCheckins && recentCheckins.length >= 3) {
       setBurnoutAlert(recentCheckins.slice(0, 3).every(c => c.energy <= 2))
     }
+
+    // --- intelligence layer ---
+    const { data: hlogs } = await supabase.from('health_logs').select('date, sleep_hours').eq('user_id', uid).order('date', { ascending: false }).limit(7)
+
+    // Pattern engine: computes once per day, cached in Supabase — cheap to call every load
+    await computeAndStorePatterns(supabase, uid)
+    const recent = await getRecentInsights(supabase, uid, 3)
+    setInsights(recent)
+
+    // Morning brief: cached per day, at most one AI call per user per day
+    const todaySleep = (hlogs || []).find(h => h.date === format(new Date(), 'yyyy-MM-dd'))?.sleep_hours ?? null
+    const streaks = (habitData || []).map(h => {
+      const logs = (hlData || []).filter(l => l.habit_id === h.id).map(l => l.completed_on).sort().reverse()
+      let streak = 0
+      let cursor = new Date()
+      for (const d of logs) {
+        if (d === format(cursor, 'yyyy-MM-dd')) { streak++; cursor = subDays(cursor, 1) } else break
+      }
+      return streak
+    })
+    const topStreak = streaks.length ? Math.max(...streaks) : 0
+
+    const brief = await getMorningBrief(supabase, uid, {
+      profile: { name: profile?.name },
+      todaySleep,
+      tasksDueToday: (taskData || []).length,
+      topHabitStreak: topStreak,
+      insight: recent?.[0]?.insight_text,
+      mood: checkinData?.mood,
+      energy: checkinData?.energy,
+      checkinDone: !!checkinData,
+    })
+    setMorningBrief(brief)
   }
 
   async function saveCheckin() {
@@ -146,18 +186,18 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
     const habitCompletion = (h || []).length > 0 ? Math.round(((l || []).length / ((h || []).length * 7)) * 100) : 0
     const emotions = [...new Set((fs || []).map(s => s.emotion).filter(Boolean))]
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      // Routed through /api/chat (server-side ANTHROPIC_KEY) instead of calling
+      // Anthropic directly from the browser with no auth header — that was 401ing silently.
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 600,
           system: `You are EVOLVE's weekly AI coach. Generate a short, warm, insightful weekly review. Be specific. Format: **Week summary** (2 sentences), **What's working** (1-2 things), **What to watch** (1 thing), **Next week focus** (1 priority), **One thing to drop**. Be honest, not a cheerleader.`,
           messages: [{ role: 'user', content: `My week: ${Math.round(totalFocus / 60)} hours focused, ${doneTasks} tasks done, avg mood ${avgMood}/5, habits ${habitCompletion}% done. Emotions: ${emotions.join(', ') || 'not tracked'}.` }]
         })
       })
       const data = await res.json()
-      const text = data.content?.[0]?.text || 'Could not generate.'
+      const text = data.text || 'Could not generate.'
       setWeeklyReport(text)
       await supabase.from('weekly_reports').insert({ user_id: uid, report_text: text, week_start: start7 })
     } catch { setWeeklyReport('Connection failed. Try again.') }
@@ -174,6 +214,9 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
   const prevLevelXP = [0, 0, 100, 300, 600, 1000, 2000][level]
   const xpPct = Math.round(((totalXP - prevLevelXP) / (nextLevelXP - prevLevelXP)) * 100)
   const levelName = ['', 'Initiate', 'Novice', 'Practitioner', 'Adept', 'Expert', 'Master'][level]
+
+  // Adaptive Day Planner — deterministic, recomputed from current mood/energy/archetype on every render
+  const adaptivePlan = checkin ? getAdaptivePlan({ mood, energy, archetype }) : null
 
   const card = (extra = {}) => ({ background: 'var(--base-800)', border: '0.5px solid var(--base-600)', borderRadius: 'var(--radius-lg)', padding: '1.25rem', ...extra })
   const lbl = { fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', fontFamily: 'var(--font-sans)', marginBottom: '12px', display: 'block' }
@@ -199,13 +242,23 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
         </div>
       )}
 
+      {/* ADAPTIVE DAY PLAN — only shown once today's check-in exists and it's not a plain "normal" day */}
+      {adaptivePlan && adaptivePlan.mode !== 'normal' && (
+        <div style={{ background: 'var(--base-800)', border: '0.5px solid var(--gold-300)', borderRadius: 'var(--radius-lg)', padding: '12px 20px', marginBottom: '20px' }}>
+          <p style={{ fontSize: '12px', fontWeight: 500, color: 'var(--gold-300)', fontFamily: 'var(--font-sans)', marginBottom: '2px' }}>◈ {adaptivePlan.headline}</p>
+          <p style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>{adaptivePlan.advice}</p>
+        </div>
+      )}
+
       {/* HEADER */}
       <div style={{ marginBottom: '24px' }}>
         <p style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'var(--font-sans)', marginBottom: '4px' }}>{today}</p>
         <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontWeight: 400, fontStyle: 'italic', color: 'var(--cream-200)', marginBottom: '6px' }}>
           {greeting}, {userName || 'friend'} ✦
         </h2>
-        <p style={{ fontSize: '13px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontStyle: 'italic', fontWeight: 300 }}>"{quote}"</p>
+        <p style={{ fontSize: '13px', color: 'var(--muted)', fontFamily: 'var(--font-sans)', fontStyle: 'italic', fontWeight: 300 }}>
+          {morningBrief ? morningBrief : `"${quote}"`}
+        </p>
         {archetype && (
           <p style={{ fontSize: '11px', color: 'var(--gold-300)', fontFamily: 'var(--font-sans)', marginTop: '6px', letterSpacing: '0.06em' }}>
             ◈ {archetype.replace(/-/g, ' ')} mode active
@@ -292,6 +345,20 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
         </div>
       </div>
 
+      {/* PATTERN ENGINE INSIGHTS */}
+      {insights.length > 0 && (
+        <div style={{ marginBottom: '14px' }}>
+          <div style={card()}>
+            <span style={lbl}>What EVOLVE has noticed</span>
+            {insights.map((ins, i) => (
+              <p key={i} style={{ fontSize: '12px', color: 'var(--cream-300)', fontFamily: 'var(--font-sans)', lineHeight: 1.6, marginBottom: i === insights.length - 1 ? 0 : '6px' }}>
+                ◆ {ins.insight_text}
+              </p>
+            ))}
+          </div>
+        </div>
+      )}
+
       {(cfg.showHabits || cfg.showStats || cfg.showXP) && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px', marginBottom: '14px' }}>
 
@@ -300,13 +367,15 @@ export default function Dashboard({ session, setActivePage, moodMode = 'normal' 
               <span style={lbl}>Habits — {habitLogs.filter(l => l.completed_on === format(new Date(), 'yyyy-MM-dd')).length}/{habits.length} done</span>
               {habits.length === 0 ? (
                 <p style={{ color: 'var(--muted)', fontSize: '13px', fontFamily: 'var(--font-sans)', fontStyle: 'italic', textAlign: 'center', padding: '16px 0' }}>No habits yet</p>
-              ) : habits.map(habit => {
+              ) : habits.map((habit, idx) => {
                 const done = habitLogs.some(l => l.habit_id === habit.id && l.completed_on === format(new Date(), 'yyyy-MM-dd'))
+                const protectedToday = adaptivePlan && idx < adaptivePlan.protectedHabitCount
                 return (
                   <div key={habit.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 0', borderBottom: '0.5px solid var(--base-700)' }}>
                     <button onClick={() => toggleHabit(habit.id)} style={{ width: '20px', height: '20px', borderRadius: '50%', flexShrink: 0, cursor: 'pointer', border: `1.5px solid ${done ? 'var(--gold-300)' : 'var(--base-500)'}`, background: done ? 'var(--gold-300)' : 'transparent', color: done ? 'var(--base-950)' : 'transparent', fontSize: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>✓</button>
                     <span style={{ fontSize: '13px', color: done ? 'var(--muted)' : 'var(--cream-300)', fontFamily: 'var(--font-sans)', textDecoration: done ? 'line-through' : 'none', flex: 1 }}>{habit.name}</span>
                     {isRecoveryDay && !done && <span style={{ fontSize: '9px', color: '#9eb5d4', fontFamily: 'var(--font-sans)' }}>protected</span>}
+                    {!isRecoveryDay && protectedToday && !done && <span style={{ fontSize: '9px', color: 'var(--gold-300)', fontFamily: 'var(--font-sans)' }}>priority</span>}
                   </div>
                 )
               })}
