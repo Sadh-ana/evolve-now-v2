@@ -121,14 +121,6 @@ Open the local development URL shown in your terminal.
 
 If the application requires environment variables, configure them using the project's existing environment setup before running it.
 
-## ◷ The road ahead
-
-- [ ] Refine the interface and overall experience
-- [ ] Continue improving personal planning workflows
-- [ ] Make progress and reflection more meaningful
-- [ ] Document the application with real screenshots
-
----
 
 <div align="center">
 
