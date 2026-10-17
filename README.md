@@ -66,28 +66,29 @@ Treat personal growth as an ongoing practice rather than a destination.
 
 > **Note:** These describe the product's intended direction. Keep them only if they accurately represent the experience your current app provides.
 
-## ◇ Inside the application
 
-<!-- Add screenshots when ready.
-     Save your real screenshots under assets/ and uncomment this section. -->
-
-<!--
-<div align="center">
-  <img src="assets/evolve-now-home.png" width="100%" alt="Evolve Now home page" />
-  <br/><br/>
-  <em>The home page · A first look at Evolve Now</em>
-  <br/><br/>
-  <img src="assets/evolve-now-dashboard.png" width="100%" alt="Evolve Now dashboard" />
-  <br/><br/>
-  <em>The dashboard · Your personal growth workspace</em>
-</div>
--->
+## ◇ Inside the experience
 
 <div align="center">
 
-*Real screenshots coming soon.*
+### Your space to grow.
+
+A closer look at the Evolve Now experience.
+
+<br/>
+
+<img src="assets/evolve-now-banner.png" width="100%" alt="Evolve Now home page" />
+
+<sub>01 — THE HOME PAGE · Start with intention.</sub>
+
+<br/><br/>
+
+<img src="assets/evolve-now-dashboard.png" width="100%" alt="Evolve Now dashboard" />
+
+<sub>02 — YOUR DASHBOARD · Turn intention into progress.</sub>
 
 </div>
+
 
 ## ⌘ Built with
 
