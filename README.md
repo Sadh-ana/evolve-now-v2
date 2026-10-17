@@ -73,7 +73,7 @@ Treat personal growth as an ongoing practice rather than a destination.
 
 <br/>
 
-<img src="assets/evolve-now-banner.png" width="100%" alt="Evolve Now — product banner" />
+<img src="assets/evolve-now-banner.png" width="100%" alt="Evolve Now banner" />
 
 <br/>
 
@@ -84,6 +84,7 @@ Treat personal growth as an ongoing practice rather than a destination.
 <br/><br/>
 
 <img src="assets/evolve-now-dashboard.png" width="100%" alt="Evolve Now dashboard" />
+
 
 <br/>
 
