@@ -69,23 +69,27 @@ Treat personal growth as an ongoing practice rather than a destination.
 
 ## ◇ Inside the experience
 
-<div align="center">
-
-### Your space to grow.
-
-A closer look at the Evolve Now experience.
+*Designed for the person you're becoming.*
 
 <br/>
 
-<img src="assets/evolve-now-banner.png" width="100%" alt="Evolve Now home page" />
+<img src="assets/evolve-now-banner.png" width="100%" alt="Evolve Now — product banner" />
 
-<sub>01 — THE HOME PAGE · Start with intention.</sub>
+<br/>
+
+<sub>01 / THE VISION</sub>
+
+### A little more intentional. A little more you.
 
 <br/><br/>
 
 <img src="assets/evolve-now-dashboard.png" width="100%" alt="Evolve Now dashboard" />
 
-<sub>02 — YOUR DASHBOARD · Turn intention into progress.</sub>
+<br/>
+
+<sub>02 / YOUR PERSONAL WORKSPACE</sub>
+
+*Turn the things you want to change into progress you can see.*
 
 </div>
 
