@@ -1,19 +1,16 @@
 
 <div align="center">
 
-# E V O L V E   N O W
-
-### *Become the person you're working toward.*
-
-A more intentional way to plan, grow, and build a life that feels like yours.
+<img src="https://capsule-render.vercel.app/api?type=waving&height=230&color=0:211915,45:49352B,100:8C6A52&text=Evolve%20Now&fontColor=F3EBDD&fontSize=58&fontAlignY=42&desc=Become%20the%20person%20you%27re%20working%20toward.&descAlignY=63&descSize=16&animation=fadeIn" width="100%" alt="Evolve Now — Become the person you're working toward" />
 
 <br/>
 
-[ **✧ EXPLORE THE LIVE APP ✧** ](https://evolvenowv2.vercel.app/)
+[**Explore the live app ↗**](https://evolvenowv2.vercel.app/) &nbsp; · &nbsp; [**Source code**](https://github.com/Sadh-ana/evolve-now-v2)
 
 <br/>
 
-`PERSONAL GROWTH` · `INTENTIONAL LIVING` · `PROGRESS`
+<img src="https://img.shields.io/badge/BUILT%20WITH-INTENTION-49352B?style=flat-square&labelColor=211915" alt="Built with intention" />
+<img src="https://img.shields.io/badge/DESIGNED%20FOR-PROGRESS-8C6A52?style=flat-square&labelColor=211915" alt="Designed for progress" />
 
 </div>
 
@@ -21,85 +18,91 @@ A more intentional way to plan, grow, and build a life that feels like yours.
 
 <div align="center">
 
-### A softer approach to becoming better.
+## A life doesn't change overnight.
+### It changes in the little things you do consistently.
 
 </div>
 
-Evolve Now is a personal growth and planning project built around one simple idea: **you don't have to transform your life overnight — you just have to keep showing up for it.**
+Evolve Now is a personal growth and planning project built around a simple belief: **becoming better doesn't require becoming someone else.**
 
-It's a space for turning intentions into action, creating routines that serve you, and making progress at your own pace.
+It's about creating space for your ambitions, building habits that support you, and turning the person you want to become into the person you're actively working toward.
 
-## 𓂃 The philosophy
+## ✦ The experience
 
 <table>
 <tr>
-<td width="33%" align="center">
+<td width="50%" valign="top">
 
-### 01
+### 01 · Plan with intention
 
-**Reflect**
-
-<br/>
-
-Understand where you are and what matters to you.
+Bring structure to your ambitions. Break down what matters into steps you can actually take.
 
 </td>
-<td width="33%" align="center">
+<td width="50%" valign="top">
 
-### 02
+### 02 · Build consistency
 
-**Intend**
-
-<br/>
-
-Turn your ambitions into clear, actionable plans.
+Create routines around the person you're becoming, one small action at a time.
 
 </td>
-<td width="33%" align="center">
+</tr>
+<tr>
+<td width="50%" valign="top">
 
-### 03
+### 03 · Make progress visible
 
-**Evolve**
+Give yourself a way to recognise the effort you're putting in, not just the finish line.
 
-<br/>
+</td>
+<td width="50%" valign="top">
 
-Build consistency and make room for progress.
+### 04 · Keep evolving
+
+Treat personal growth as an ongoing practice rather than a destination.
 
 </td>
 </tr>
 </table>
 
-## ✧ Inside Evolve Now
+> **Note:** These describe the product's intended direction. Keep them only if they accurately represent the experience your current app provides.
 
-<!-- Replace these descriptions with the exact features currently available in the app. -->
+## ◇ Inside the application
 
-- **Your personal space** — a central place to organise your growth journey.
-- **Habits & routines** — make room for the actions you want to repeat.
-- **Goals & planning** — break bigger ambitions into manageable steps.
-- **Progress & reflection** — focus on learning, not just ticking boxes.
-
-## 𓇢 A glimpse of the experience
-
-<!-- When you have a screenshot, save it as assets/evolve-now-home.png
-     and uncomment the image below. -->
+<!-- Add screenshots when ready.
+     Save your real screenshots under assets/ and uncomment this section. -->
 
 <!--
 <div align="center">
-  <img src="assets/evolve-now-home.png" width="92%" alt="Evolve Now application home page" />
-  <em>A space to plan with intention and grow at your own pace.</em>
+  <img src="assets/evolve-now-home.png" width="100%" alt="Evolve Now home page" />
+  <br/><br/>
+  <em>The home page · A first look at Evolve Now</em>
+  <br/><br/>
+  <img src="assets/evolve-now-dashboard.png" width="100%" alt="Evolve Now dashboard" />
+  <br/><br/>
+  <em>The dashboard · Your personal growth workspace</em>
 </div>
 -->
 
-## ✧ The craft behind it
+<div align="center">
 
-![React](https://img.shields.io/badge/React-49352B?style=flat-square&logo=react&logoColor=F3EBDD)
-![Vite](https://img.shields.io/badge/Vite-49352B?style=flat-square&logo=vite&logoColor=D7C3A8)
-![JavaScript](https://img.shields.io/badge/JavaScript-49352B?style=flat-square&logo=javascript&logoColor=F3EBDD)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-49352B?style=flat-square&logo=tailwindcss&logoColor=D7C3A8)
+*Real screenshots coming soon.*
 
-## ⌘ Run it locally
+</div>
 
-Make sure you have Node.js and npm installed.
+## ⌘ Built with
+
+<div align="center">
+
+<img src="https://img.shields.io/badge/React-49352B?style=for-the-badge&logo=react&logoColor=F3EBDD" alt="React" />
+<img src="https://img.shields.io/badge/Vite-49352B?style=for-the-badge&logo=vite&logoColor=D7C3A8" alt="Vite" />
+<img src="https://img.shields.io/badge/JavaScript-49352B?style=for-the-badge&logo=javascript&logoColor=F3EBDD" alt="JavaScript" />
+<img src="https://img.shields.io/badge/Tailwind_CSS-49352B?style=for-the-badge&logo=tailwindcss&logoColor=D7C3A8" alt="Tailwind CSS" />
+
+</div>
+
+## ↗ Run locally
+
+You'll need [Node.js](https://nodejs.org/) and npm.
 
 ```bash
 git clone https://github.com/Sadh-ana/evolve-now-v2.git
@@ -108,22 +111,29 @@ npm install
 npm run dev
 ```
 
-Open the local address shown in your terminal.
+Open the local development URL shown in your terminal.
 
-## 𓍯 What's next
+If the application requires environment variables, configure them using the project's existing environment setup before running it.
 
-- [ ] Refine the experience and visual details
-- [ ] Improve the way progress is represented
-- [ ] Continue building thoughtful tools for personal growth
+## ◷ The road ahead
+
+- [ ] Refine the interface and overall experience
+- [ ] Continue improving personal planning workflows
+- [ ] Make progress and reflection more meaningful
+- [ ] Document the application with real screenshots
 
 ---
 
 <div align="center">
 
+### Growth, at your own pace.
+
 *You are allowed to be a work in progress.*
 
-**Made with intention ♡**
+<br/>
 
-[Live application](https://evolvenowv2.vercel.app/) · [Source code](https://github.com/Sadh-ana/evolve-now-v2)
+**Created by [Sadh-ana](https://github.com/Sadh-ana) ♡**
+
+<sub>Small steps. Honest effort. A life designed deliberately.</sub>
 
 </div>
