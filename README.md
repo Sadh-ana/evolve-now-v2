@@ -149,9 +149,6 @@ If the application requires environment variables, configure them using the proj
 
 **[Explore Evolve Now ↗](https://evolvenowv2.vercel.app/)**
 
-<sub>Created with care by [Sadh-ana](https://github.com/Sadh-ana)</sub>
-
-</div>
 
 
 **Created by [Sadh-ana](https://github.com/Sadh-ana) ♡**
