@@ -1,7 +1,7 @@
 
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&height=230&color=0:211915,45:49352B,100:8C6A52&text=Evolve%20Now&fontColor=F3EBDD&fontSize=58&fontAlignY=42&desc=Become%20the%20person%20you%27re%20working%20toward.&descAlignY=63&descSize=16&animation=fadeIn" width="100%" alt="Evolve Now — Become the person you're working toward" />
+<img src="https://capsule-render.vercel.app/api?type=waving&height=240&color=0:211915,45:49352B,100:8C6A52&text=Evolve%20Now&fontColor=F3EBDD&fontSize=62&fontAlignY=40&desc=Become%20the%20person%20you%27re%20working%20toward.&descAlignY=62&descSize=16&animation=fadeIn" width="100%" alt="Evolve Now — Become the person you're working toward" />
 
 <br/>
 
@@ -131,11 +131,27 @@ If the application requires environment variables, configure them using the proj
 
 <div align="center">
 
-### Growth, at your own pace.
+
+---
+
+<div align="center">
+
+### GROWTH, AT YOUR OWN PACE.
 
 *You are allowed to be a work in progress.*
 
 <br/>
+
+<img src="https://img.shields.io/badge/MADE-WITH%20INTENTION-49352B?style=for-the-badge&labelColor=211915" alt="Made with intention" />
+
+<br/><br/>
+
+**[Explore Evolve Now ↗](https://evolvenowv2.vercel.app/)**
+
+<sub>Created with care by [Sadh-ana](https://github.com/Sadh-ana)</sub>
+
+</div>
+
 
 **Created by [Sadh-ana](https://github.com/Sadh-ana) ♡**
 
