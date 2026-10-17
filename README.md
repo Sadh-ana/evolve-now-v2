@@ -1,16 +1,66 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<div align="center">
 
-Currently, two official plugins are available:
+# Evolve Now ✦
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### Become the person you're working toward.
 
-## React Compiler
+A personal growth and planning app designed to help you turn intentions into action, build better habits, and make progress that lasts.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+[**Live Demo ↗**](https://evolvenow-sadh-anas-projects.vercel.app/)
 
-## Expanding the ESLint configuration
+</div>
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## ✧ About the project
+
+Evolve Now is a personal growth project built around the idea that meaningful change comes from consistent, intentional action.
+
+The goal is to bring planning, habits, and personal development into one place — helping you move from wanting to improve to actually doing something about it.
+
+## ✦ Features
+
+<!-- Update these to match the features currently working in the app. -->
+
+- **Personal dashboard** — a central place to review your progress.
+- **Habit building** — support for creating more consistent routines.
+- **Planning tools** — organise goals and turn intentions into actionable steps.
+- **Progress tracking** — reflect on your development over time.
+
+## ⌘ Tech stack
+
+![React](https://img.shields.io/badge/React-351522?style=flat-square&logo=react&logoColor=D7A6B8)
+![Vite](https://img.shields.io/badge/Vite-351522?style=flat-square&logo=vite&logoColor=A78BFA)
+![JavaScript](https://img.shields.io/badge/JavaScript-351522?style=flat-square&logo=javascript&logoColor=D7A6B8)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-351522?style=flat-square&logo=tailwindcss&logoColor=A78BFA)
+
+## 🚀 Getting started
+
+### Prerequisites
+
+- Node.js
+- npm
+
+### Installation
+
+```bash
+git clone https://github.com/Sadh-ana/evolve-now-v2.git
+cd evolve-now-v2
+npm install
+npm run dev
+```
+
+Open the local URL printed by Vite in your terminal.
+
+## 🗺️ Roadmap
+
+- [ ] Refine the user experience
+- [ ] Improve progress visualisation
+- [ ] Continue improving the planning workflow
+
+## ♡ Built with intention
+
+Created by [Sadh-ana](https://github.com/Sadh-ana).
+
+*Small steps. Honest effort. A life designed deliberately.*
